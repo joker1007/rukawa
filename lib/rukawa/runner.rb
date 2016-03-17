@@ -12,19 +12,21 @@ module Rukawa
     def run(job_net, batch_mode = false)
       @job_net = job_net
 
+      Rukawa.logger.info("=== Start #{@job_net.class} ===")
       futures = @job_net.run
       until futures.all?(&:complete?)
         display_table unless batch_mode
         sleep REFRESH_INTERVAL
       end
+      Rukawa.logger.info("=== Finish #{@job_net.class} ===")
 
       display_table unless batch_mode
 
       has_error = false
-      futures.each do |f|
-        if f.reason
+      @job_net.dag.each do |j|
+        if j.dataflow.reason
           has_error = true
-          Rukawa.logger.error(f.reason)
+          Rukawa.logger.error(j.dataflow.reason)
         end
       end
 
