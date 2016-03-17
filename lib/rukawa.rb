@@ -19,7 +19,7 @@ module Rukawa
     end
 
     def executor
-      @executor ||= Concurrent::FixedThreadPool.new(config.concurrency)
+      @executor ||= Concurrent::FixedThreadPool.new(config.concurrency + 1)
     end
   end
 end

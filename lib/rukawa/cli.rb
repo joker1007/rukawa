@@ -5,11 +5,16 @@ module Rukawa
   class Cli < Thor
     desc "run", "Run jobnet"
     map "run" => "_run"
-    method_option :concurrency, aliases: "-c", type: :numeric, default: nil
+    method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
     method_option :job_dirs, type: :array, default: []
     method_option :batch, aliases: "-b", type: :boolean, default: false
+    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
     def _run(job_net_name)
+      Rukawa.configure do |c|
+        c.log_file = options[:log]
+        c.concurrency = options[:concurrency] if options[:concurrency]
+      end
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
