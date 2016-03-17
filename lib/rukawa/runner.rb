@@ -46,15 +46,15 @@ module Rukawa
 
     def colored_state(state)
       case state
-      when :fulfilled
+      when :finished
         Paint[state.to_s, :green]
-      when :rejected
+      when :error
         Paint[state.to_s, :red]
-      when :processing
+      when :running
         Paint[state.to_s, :blue]
-      when :pending
+      when :waiting
         Paint[state.to_s, :yellow]
-      when :unscheduled
+      else
         state.to_s
       end
     end

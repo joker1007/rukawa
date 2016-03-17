@@ -5,10 +5,13 @@ module Rukawa
     class ParentJobFailure < StandardError; end
 
     attr_accessor :in_jobs, :out_jobs
+    attr_reader :state
+    STATES = %i(waiting running finished error).freeze
 
     def initialize
       @in_jobs = []
       @out_jobs = []
+      @state = :waiting
     end
 
     def depend(job)
@@ -21,22 +24,19 @@ module Rukawa
 
       @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         Rukawa.logger.info("Start #{self.class}")
+        @state = :running
         begin
           raise ParentJobFailure unless results.all?
           run
         rescue => e
           Rukawa.logger.error("Error #{self.class} by #{e}")
+          @state = :error
           raise
         end
         Rukawa.logger.info("Finish #{self.class}")
+        @state = :finished
         true
       end
-    end
-
-    def state
-      return nil unless @dataflow
-
-      @dataflow.state
     end
 
     def store(key, value)
