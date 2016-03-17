@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "rukawa"
+require "rukawa/cli"
+
+Rukawa::Cli.start
