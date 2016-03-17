@@ -21,8 +21,13 @@ module Rukawa
 
       @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         Rukawa.logger.info("Start #{self.class}")
-        raise ParentJobFailure unless results.all?
-        run
+        begin
+          raise ParentJobFailure unless results.all?
+          run
+        rescue => e
+          Rukawa.logger.error("Error #{self.class} by #{e}")
+          raise
+        end
         Rukawa.logger.info("Finish #{self.class}")
         true
       end

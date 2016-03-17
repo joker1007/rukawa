@@ -20,8 +20,16 @@ module Rukawa
 
       display_table unless batch_mode
 
+      has_error = false
       futures.each do |f|
-        raise f.reason if f.reason
+        if f.reason
+          has_error = true
+          Rukawa.logger.error(f.reason)
+        end
+      end
+
+      if has_error
+        exit 1
       end
     end
 
