@@ -25,7 +25,6 @@ module Rukawa
 
     desc "graph", "Output jobnet graph"
     method_option :job_dirs, type: :array, default: []
-    method_option :format, aliases: "-f", type: :string, default: :dot
     method_option :output, aliases: "-o", type: :string, required: true
     def graph(job_net_name)
       load_job_definitions
