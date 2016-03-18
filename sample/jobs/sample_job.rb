@@ -1,6 +1,7 @@
 class SampleJob < Rukawa::Job
   def run
     sleep rand(5)
+    puts "executed #{self.class}"
   end
 end
 
@@ -20,4 +21,18 @@ end
 class Job6 < SampleJob
 end
 class Job7 < SampleJob
+end
+class Job8 < SampleJob
+end
+
+class InnerJob1 < SampleJob
+end
+
+class InnerJob2 < SampleJob
+  def run
+    raise "inner job2 error"
+  end
+end
+
+class InnerJob3 < SampleJob
 end

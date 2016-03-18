@@ -3,34 +3,34 @@ require 'paint'
 
 module Rukawa
   class Runner
-    REFRESH_INTERVAL = 5
+    REFRESH_INTERVAL = 1
 
     def self.run(job_net, batch_mode = false)
-      new.run(job_net, batch_mode)
+      new(job_net).run(batch_mode)
     end
 
-    def run(job_net, batch_mode = false)
-      @job_net = job_net
+    def initialize(root_job_net)
+      @root_job_net = root_job_net
+      @errors = []
+    end
 
-      Rukawa.logger.info("=== Start #{@job_net.class} ===")
-      futures = @job_net.run
-      until futures.all?(&:complete?)
+    def run(batch_mode = false)
+      Rukawa.logger.info("=== Start Rukawa ===")
+      future = @root_job_net.dataflow.tap(&:execute)
+      until future.complete?
         display_table unless batch_mode
         sleep REFRESH_INTERVAL
       end
-      Rukawa.logger.info("=== Finish #{@job_net.class} ===")
+      Rukawa.logger.info("=== Finish Rukawa ===")
 
       display_table unless batch_mode
 
-      has_error = false
-      @job_net.dag.each do |j|
-        if j.dataflow.reason
-          has_error = true
-          Rukawa.logger.error(j.dataflow.reason)
-        end
-      end
+      collect_errors(@root_job_net)
 
-      if has_error
+      unless @errors.empty?
+        @errors.each do |err|
+          Rukawa.logger.error(err)
+        end
         exit 1
       end
     end
@@ -39,11 +39,22 @@ module Rukawa
 
     def display_table
       table = Terminal::Table.new headings: ["Job", "Status"] do |t|
-        @job_net.dag.each do |j|
-          t << [Paint[j.class.to_s, :bold], colored_state(j.state)]
+        @root_job_net.dag.each_with_index do |j|
+          table_row(t, j)
         end
       end
       puts table
+    end
+
+    def table_row(table, job, level = 0)
+      if job.respond_to?(:dag)
+        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], colored_state(job.state)]
+        job.dag.each do |inner_j|
+          table_row(table, inner_j, level + 1)
+        end
+      else
+        table << [Paint["#{"  " * level}#{job.class}", :bold], colored_state(job.state)]
+      end
     end
 
     def colored_state(state)
@@ -58,6 +69,16 @@ module Rukawa
         Paint[state.to_s, :yellow]
       else
         state.to_s
+      end
+    end
+
+    def collect_errors(job_net)
+      job_net.dag.each do |j|
+        if j.respond_to?(:dag)
+          collect_errors(j)
+        else
+          @errors << j.dataflow.reason if j.dataflow.reason
+        end
       end
     end
   end

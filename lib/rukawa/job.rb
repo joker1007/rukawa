@@ -2,8 +2,6 @@ require 'concurrent'
 
 module Rukawa
   class Job
-    class ParentJobFailure < StandardError; end
-
     attr_accessor :in_jobs, :out_jobs
     attr_reader :state
     STATES = %i(waiting running finished error).freeze
@@ -26,7 +24,7 @@ module Rukawa
         Rukawa.logger.info("Start #{self.class}")
         @state = :running
         begin
-          raise ParentJobFailure unless results.all?
+          raise DependentJobFailure unless results.all?
           run
         rescue => e
           Rukawa.logger.error("Error #{self.class} by #{e}")
@@ -50,6 +48,10 @@ module Rukawa
 
     def leaf?
       @out_jobs.empty?
+    end
+
+    def complete?
+      dataflow.complete?
     end
 
     def run

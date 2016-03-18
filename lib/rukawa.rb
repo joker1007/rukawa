@@ -25,6 +25,7 @@ module Rukawa
 end
 
 require "rukawa/version"
+require 'rukawa/errors'
 require 'rukawa/configuration'
 require 'rukawa/job_net'
 require 'rukawa/job'
