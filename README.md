@@ -108,8 +108,14 @@ class SampleJobNet < Rukawa::JobNet
 end
 ```
 
+JobNet can be nesting.
+
+### Execution
+
 ```
 % cd rukawa/sample
+
+# load ./jobs/**/*.rb, ./job_net/**/*.rb automatically
 % bundle exec rukawa run SampleJobNet
 +------+-------------+
 | Job  | Status      |
@@ -147,7 +153,7 @@ end
 ```
 
 ## ToDo
-- Write tests
+- Write more tests
 - Enable use variables
 - Output graphviz
 
