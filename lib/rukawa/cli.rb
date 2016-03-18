@@ -19,7 +19,8 @@ module Rukawa
 
       job_net_class = Object.const_get(job_net_name)
       job_net = job_net_class.new(options[:variables])
-      Runner.run(job_net, options[:batch])
+      result = Runner.run(job_net, options[:batch])
+      exit 1 unless result
     end
 
     private

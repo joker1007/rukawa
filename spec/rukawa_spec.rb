@@ -1,11 +1,25 @@
 require 'spec_helper'
 
 describe Rukawa do
-  it 'has a version number' do
-    expect(Rukawa::VERSION).not_to be nil
-  end
+  it 'run jobs correctly' do
+    Rukawa.configure do |c|
+      c.log_file = STDOUT
+    end
+    Rukawa::Runner.run(SampleJobNet.new, true)
+    expect(ExecuteLog.store).to match({
+      Job1 => an_instance_of(Time),
+      Job2 => an_instance_of(Time),
+      Job3 => an_instance_of(Time),
+      Job4 => an_instance_of(Time),
+      InnerJob3 => an_instance_of(Time),
+      InnerJob1 => an_instance_of(Time),
+    })
 
-  it 'does something useful' do
-    expect(false).to eq(true)
+    expect(ExecuteLog.store[Job2]).to satisfy { |v| v > ExecuteLog.store[Job1] }
+    expect(ExecuteLog.store[Job3]).to satisfy { |v| v > ExecuteLog.store[Job1] }
+    expect(ExecuteLog.store[Job4]).to satisfy { |v| v > ExecuteLog.store[Job2] }
+    expect(ExecuteLog.store[Job4]).to satisfy { |v| v > ExecuteLog.store[Job3] }
+    expect(ExecuteLog.store[InnerJob3]).to satisfy { |v| v > ExecuteLog.store[Job3] }
+    expect(ExecuteLog.store[InnerJob1]).to satisfy { |v| v > ExecuteLog.store[Job3] }
   end
 end

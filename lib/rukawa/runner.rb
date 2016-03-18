@@ -31,8 +31,10 @@ module Rukawa
         @errors.each do |err|
           Rukawa.logger.error(err)
         end
-        exit 1
+        return false
       end
+
+      true
     end
 
     private

@@ -22,7 +22,7 @@ module Rukawa
     end
 
     def run
-      inner_dataflows.map(&:execute).each(&:wait)
+      inner_dataflows.each(&:execute).each(&:wait)
     end
 
     private

@@ -1,7 +1,13 @@
+module ExecuteLog
+  def self.store
+    @store ||= {}
+  end
+end
+
 class SampleJob < Rukawa::Job
   def run
     sleep rand(5)
-    puts "executed #{self.class}"
+    ExecuteLog.store[self.class] = Time.now
   end
 end
 
