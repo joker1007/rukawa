@@ -1,4 +1,6 @@
 # Rukawa
+[![Build Status](https://travis-ci.org/joker1007/rukawa.svg?branch=master)](https://travis-ci.org/joker1007/rukawa)
+
 Rukawa = (流川)
 
 This gem is workflow engine and this is hyper simple.
@@ -155,7 +157,6 @@ JobNet can be nesting.
 ## ToDo
 - Write more tests
 - Enable use variables
-- Output graphviz
 
 ## Development
 
