@@ -58,49 +58,27 @@ end
 ### JobNet Definition
 ```rb
 # job_nets/sample_job_net.rb
+class InnerJobNet < Rukawa::JobNet
+  class << self
+    def dependencies
+      {
+        InnerJob3 => [],
+        InnerJob1 => [],
+        InnerJob2 => [InnerJob1, InnerJob3],
+      }
+    end
+  end
+end
+
 class SampleJobNet < Rukawa::JobNet
   class << self
-    # +------------+
-    # |    job1    |
-    # |            |
-    # +------+-----+
-    #        |
-    #        +-----------------+
-    #        |                 |
-    #        |                 |
-    # +------v-----+    +------v-----+
-    # |    job2    |    |    job3    |
-    # |            |    |            |
-    # +------+-----+    +-----+--+---+
-    #        |                |  |
-    #        <----------------+  |
-    #        |                   |
-    #        |                   |
-    # +------v-----+      +------v-----+
-    # |    job4    |      |    job5    |
-    # |            |      |            |
-    # +------+-----+      +------+-----+
-    #        |                   |
-    #        |                   |
-    #        <-------------------+
-    #        |
-    # +------v-----+
-    # |    job6    |
-    # |            |
-    # +------+-----+
-    #        |
-    #        |
-    #        |
-    #        |
-    # +------v-----+
-    # |    job7    |
-    # |            |
-    # +------------+
     def dependencies
       {
         Job1 => [],
         Job2 => [Job1], Job3 => [Job1],
         Job4 => [Job2, Job3],
+        InnerJobNet => [Job3],
+        Job8 => [InnerJobNet],
         Job5 => [Job3],
         Job6 => [Job4, Job5],
         Job7 => [Job6],
@@ -110,7 +88,7 @@ class SampleJobNet < Rukawa::JobNet
 end
 ```
 
-JobNet can be nesting.
+![jobnet.png](https://raw.githubusercontent.com/joker1007/rukawa/master/sample/jobnet.png)
 
 ### Execution
 
@@ -152,6 +130,13 @@ JobNet can be nesting.
 | Job6 | rejected  |
 | Job7 | rejected  |
 +------+-----------+
+```
+
+### Output jobnet graph (dot file)
+
+```
+% bundle exec rukawa graph -o SampleJobNet.dot SampleJobNet
+% dot -Tpng -o SampleJobNet.png SampleJobNet.dot
 ```
 
 ## ToDo
