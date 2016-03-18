@@ -41,7 +41,7 @@ module Rukawa
 
     def display_table
       table = Terminal::Table.new headings: ["Job", "Status"] do |t|
-        @root_job_net.dag.each_with_index do |j|
+        @root_job_net.each_with_index do |j|
           table_row(t, j)
         end
       end
@@ -49,9 +49,9 @@ module Rukawa
     end
 
     def table_row(table, job, level = 0)
-      if job.respond_to?(:dag)
+      if job.is_a?(JobNet)
         table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], colored_state(job.state)]
-        job.dag.each do |inner_j|
+        job.each do |inner_j|
           table_row(table, inner_j, level + 1)
         end
       else
@@ -75,8 +75,8 @@ module Rukawa
     end
 
     def collect_errors(job_net)
-      job_net.dag.each do |j|
-        if j.respond_to?(:dag)
+      job_net.each do |j|
+        if j.is_a?(JobNet)
           collect_errors(j)
         else
           @errors << j.dataflow.reason if j.dataflow.reason

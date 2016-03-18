@@ -3,7 +3,7 @@ require 'set'
 module Rukawa
   class Dag
     include Enumerable
-    include TSort
+    attr_reader :root
 
     def initialize(dependencies)
       deps = tsortable_hash(dependencies).tsort
@@ -30,11 +30,6 @@ module Rukawa
       else
         @jobs.each
       end
-    end
-    alias :tsort_each_node :each
-
-    def tsort_each_child(node, &block)
-      node.out_jobs.each(&block)
     end
 
     def leaves

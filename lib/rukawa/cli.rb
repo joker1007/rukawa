@@ -23,6 +23,18 @@ module Rukawa
       exit 1 unless result
     end
 
+    desc "graph", "Output jobnet graph"
+    method_option :job_dirs, type: :array, default: []
+    method_option :format, aliases: "-f", type: :string, default: :dot
+    method_option :output, aliases: "-o", type: :string, required: true
+    def graph(job_net_name)
+      load_job_definitions
+
+      job_net_class = Object.const_get(job_net_name)
+      job_net = job_net_class.new(options[:variables])
+      job_net.output_dot(options[:format], options[:output])
+    end
+
     private
 
     def default_job_dirs

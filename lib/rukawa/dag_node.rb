@@ -26,6 +26,10 @@ module Rukawa
       @out_jobs.empty?
     end
 
+    def name
+      self.class.to_s
+    end
+
     def dataflow
       return @dataflow if @dataflow
 
