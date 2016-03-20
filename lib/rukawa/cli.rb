@@ -7,9 +7,10 @@ module Rukawa
     map "run" => "_run"
     method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
-    method_option :job_dirs, type: :array, default: []
-    method_option :batch, aliases: "-b", type: :boolean, default: false
+    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
+    method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
     method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :refresh, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name)
       Rukawa.configure do |c|
         c.log_file = options[:log]

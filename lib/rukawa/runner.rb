@@ -3,10 +3,10 @@ require 'paint'
 
 module Rukawa
   class Runner
-    REFRESH_INTERVAL = 1
+    DEFAULT_REFRESH_INTERVAL = 3
 
-    def self.run(job_net, batch_mode = false)
-      new(job_net).run(batch_mode)
+    def self.run(job_net, batch_mode = false, refresh_interval = DEFAULT_REFRESH_INTERVAL)
+      new(job_net).run(batch_mode, refresh_interval)
     end
 
     def initialize(root_job_net)
@@ -14,12 +14,12 @@ module Rukawa
       @errors = []
     end
 
-    def run(batch_mode = false)
+    def run(batch_mode = false, refresh_interval = DEFAULT_REFRESH_INTERVAL)
       Rukawa.logger.info("=== Start Rukawa ===")
       future = @root_job_net.dataflow.tap(&:execute)
       until future.complete?
         display_table unless batch_mode
-        sleep REFRESH_INTERVAL
+        sleep refresh_interval
       end
       Rukawa.logger.info("=== Finish Rukawa ===")
 
