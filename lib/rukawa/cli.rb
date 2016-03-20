@@ -3,7 +3,7 @@ require 'rukawa/runner'
 
 module Rukawa
   class Cli < Thor
-    desc "run", "Run jobnet"
+    desc "run JOB_NET_NAME", "Run jobnet"
     map "run" => "_run"
     method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
@@ -30,7 +30,7 @@ module Rukawa
       exit 1 unless result
     end
 
-    desc "graph", "Output jobnet graph"
+    desc "graph JOB_NET_NAME", "Output jobnet graph"
     method_option :job_dirs, type: :array, default: []
     method_option :output, aliases: "-o", type: :string, required: true
     def graph(job_net_name)
