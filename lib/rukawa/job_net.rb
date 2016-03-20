@@ -35,27 +35,12 @@ module Rukawa
       buf = "#{graphdef} #{subgraph ? "cluster_" : ""}#{name} {\n"
       buf += %Q{label = "#{name}";\n}
       buf += "color = blue;\n" if subgraph
-      @dag.each do |j|
-        if j.is_a?(JobNet)
-          buf += j.to_dot(true)
-        end
-
-        if j.is_a?(Job)
-          buf += "#{j.name} [color = #{j.state.color}];\n" unless j.state == Rukawa::State::Waiting
-        end
+      dag.each do |j|
+        buf += j.to_dot_def
 
         j.out_jobs.each do |_j|
-          if j.is_a?(JobNet)
-            from_nodes = j.dag.leaves.map(&:name)
-          else
-            from_nodes = Array(j.name)
-          end
-
-          if _j.is_a?(JobNet)
-            to_nodes = _j.dag.root.out_jobs.map(&:name)
-          else
-            to_nodes = Array(_j.name)
-          end
+          from_nodes = j.to_dot_from_nodes
+          to_nodes = _j.to_dot_to_nodes
 
           from_nodes.each do |from|
             to_nodes.each do |to|
@@ -65,6 +50,18 @@ module Rukawa
         end
       end
       buf += "}\n"
+    end
+
+    def to_dot_def
+      to_dot(true)
+    end
+
+    def to_dot_from_nodes
+      dag.leaves.map(&:name)
+    end
+
+    def to_dot_to_nodes
+      dag.root.out_jobs.map(&:name)
     end
 
     def root

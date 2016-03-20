@@ -12,6 +12,19 @@ module Rukawa
 
     def run
     end
+
+    def to_dot_def
+      if state == Rukawa::State::Waiting
+        ""
+      else
+        "#{name} [color = #{state.color}];\n" unless state == Rukawa::State::Waiting
+      end
+    end
+
+    def to_dot_from_nodes
+      Array(name)
+    end
+    alias :to_dot_to_nodes :to_dot_from_nodes
   end
 
   class RootJob < Job
