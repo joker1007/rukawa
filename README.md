@@ -141,41 +141,74 @@ end
 % cd rukawa/sample
 
 # load ./jobs/**/*.rb, ./job_net/**/*.rb automatically
-% bundle exec rukawa run SampleJobNet
-+------+-------------+
-| Job  | Status      |
-+------+-------------+
-| Job1 | pending     |
-| Job2 | unscheduled |
-| Job3 | unscheduled |
-| Job4 | unscheduled |
-| Job5 | unscheduled |
-| Job6 | unscheduled |
-| Job7 | pending     |
-+------+-------------+
-+------+-------------+
-| Job  | Status      |
-+------+-------------+
-| Job1 | fulfilled   |
-| Job2 | fulfilled   |
-| Job3 | fulfilled   |
-| Job4 | processing  |
-| Job5 | rejected    |
-| Job6 | unscheduled |
-| Job7 | processing  |
-+------+-------------+
-+------+-----------+
-| Job  | Status    |
-+------+-----------+
-| Job1 | fulfilled |
-| Job2 | fulfilled |
-| Job3 | fulfilled |
-| Job4 | fulfilled |
-| Job5 | rejected  |
-| Job6 | rejected  |
-| Job7 | rejected  |
-+------+-----------+
+% bundle exec rukawa run SampleJobNet -r 5 -d result.dot
++--------------+---------+
+| Job          | Status  |
++--------------+---------+
+| Job1         | waiting |
+| Job2         | waiting |
+| Job3         | waiting |
+| Job4         | waiting |
+| InnerJobNet  | waiting |
+|   InnerJob3  | waiting |
+|   InnerJob1  | waiting |
+|   InnerJob2  | waiting |
+| Job8         | waiting |
+| Job5         | waiting |
+| Job6         | waiting |
+| Job7         | waiting |
+| InnerJobNet2 | waiting |
+|   InnerJob4  | waiting |
+|   InnerJob5  | waiting |
+|   InnerJob6  | waiting |
++--------------+---------+
++--------------+----------+
+| Job          | Status   |
++--------------+----------+
+| Job1         | finished |
+| Job2         | finished |
+| Job3         | finished |
+| Job4         | finished |
+| InnerJobNet  | running  |
+|   InnerJob3  | running  |
+|   InnerJob1  | running  |
+|   InnerJob2  | waiting  |
+| Job8         | waiting  |
+| Job5         | error    |
+| Job6         | error    |
+| Job7         | error    |
+| InnerJobNet2 | running  |
+|   InnerJob4  | running  |
+|   InnerJob5  | skipped  |
+|   InnerJob6  | waiting  |
++--------------+----------+
++--------------+----------+
+| Job          | Status   |
++--------------+----------+
+| Job1         | finished |
+| Job2         | finished |
+| Job3         | finished |
+| Job4         | finished |
+| InnerJobNet  | error    |
+|   InnerJob3  | finished |
+|   InnerJob1  | finished |
+|   InnerJob2  | error    |
+| Job8         | error    |
+| Job5         | error    |
+| Job6         | error    |
+| Job7         | error    |
+| InnerJobNet2 | finished |
+|   InnerJob4  | finished |
+|   InnerJob5  | skipped  |
+|   InnerJob6  | skipped  |
++--------------+----------+
+
+# generate result graph image
+% dot -Tpng -o result.png result.dot
 ```
+
+![jobnet.png](https://raw.githubusercontent.com/joker1007/rukawa/master/sample/result.png)
+
 
 ### Output jobnet graph (dot file)
 
