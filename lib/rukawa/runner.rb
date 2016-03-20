@@ -55,7 +55,7 @@ module Rukawa
           table_row(table, inner_j, level + 1)
         end
       else
-        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored + " #{job.dataflow.state}"]
+        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored]
       end
     end
 
