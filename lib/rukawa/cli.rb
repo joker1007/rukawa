@@ -10,7 +10,8 @@ module Rukawa
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
     method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
-    method_option :refresh, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
+    method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
+    method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name)
       Rukawa.configure do |c|
         c.log_file = options[:log]
@@ -20,7 +21,12 @@ module Rukawa
 
       job_net_class = Object.const_get(job_net_name)
       job_net = job_net_class.new(options[:variables])
-      result = Runner.run(job_net, options[:batch])
+      result = Runner.run(job_net, options[:batch], options[:refresh_interval])
+
+      if options[:dot]
+        job_net.output_dot(options[:dot])
+      end
+
       exit 1 unless result
     end
 
@@ -32,7 +38,7 @@ module Rukawa
 
       job_net_class = Object.const_get(job_net_name)
       job_net = job_net_class.new(options[:variables])
-      job_net.output_dot(options[:format], options[:output])
+      job_net.output_dot(options[:output])
     end
 
     private

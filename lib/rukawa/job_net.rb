@@ -26,7 +26,7 @@ module Rukawa
       inner_dataflows.each(&:execute).each(&:wait)
     end
 
-    def output_dot(format, filename)
+    def output_dot(filename)
       File.open(filename, 'w') { |f| f.write(to_dot) }
     end
 
@@ -38,6 +38,10 @@ module Rukawa
       @dag.each do |j|
         if j.is_a?(JobNet)
           buf += j.to_dot(true)
+        end
+
+        if j.is_a?(Job)
+          buf += "#{j.name} [color = #{j.state.color}];\n" unless j.state == Rukawa::State::Waiting
         end
 
         j.out_jobs.each do |_j|
