@@ -21,7 +21,11 @@ module Rukawa
     def initialize(*)
       @in_jobs = []
       @out_jobs = []
-      @state = :waiting
+      set_state(:waiting)
+    end
+
+    def set_state(name)
+      @state = Rukawa::State.get(name)
     end
 
     def depend(job)
@@ -48,23 +52,23 @@ module Rukawa
         begin
           raise DependentJobFailure unless results.all? { |r| !r.nil? }
 
-          if skip? || results.any? { |r| r == :skipped }
+          if skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
             Rukawa.logger.info("Skip #{self.class}")
-            @state = :skipped
+            set_state(:skipped)
           else
             Rukawa.logger.info("Start #{self.class}")
-            @state = :running
+            set_state(:running)
             run
             unless children_errors.empty?
               raise ChildrenJobFailure
             end
 
             Rukawa.logger.info("Finish #{self.class}")
-            @state = :finished
+            set_state(:finished)
           end
         rescue => e
           Rukawa.logger.error("Error #{self.class} by #{e}")
-          @state = :error
+          set_state(:error)
           raise
         end
 

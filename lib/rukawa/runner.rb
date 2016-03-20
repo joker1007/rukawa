@@ -50,27 +50,12 @@ module Rukawa
 
     def table_row(table, job, level = 0)
       if job.is_a?(JobNet)
-        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], colored_state(job.state)]
+        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], job.state.colored]
         job.each do |inner_j|
           table_row(table, inner_j, level + 1)
         end
       else
-        table << [Paint["#{"  " * level}#{job.class}", :bold], colored_state(job.state)]
-      end
-    end
-
-    def colored_state(state)
-      case state
-      when :finished
-        Paint[state.to_s, :green]
-      when :error
-        Paint[state.to_s, :red]
-      when :running
-        Paint[state.to_s, :blue]
-      when :waiting
-        Paint[state.to_s, :yellow]
-      else
-        state.to_s
+        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored]
       end
     end
 

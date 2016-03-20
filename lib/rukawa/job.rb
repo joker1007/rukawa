@@ -4,8 +4,6 @@ require 'rukawa/dag_node'
 module Rukawa
   class Job
     include DagNode
-    attr_reader :state
-    STATES = %i(waiting running finished error).freeze
 
     def store(key, value)
       Rukawa.store[self.class] ||= Concurrent::Hash.new
