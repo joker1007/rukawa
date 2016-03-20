@@ -11,17 +11,21 @@ module Rukawa::State
     def colored
       Paint[state_name.to_s, color]
     end
+
+    def merge(other)
+      other
+    end
   end
 
   module Running
     extend BaseExt
 
-    def name
-      :running
-    end
-
     def self.color
       :cyan
+    end
+
+    def self.merge(_other)
+      self
     end
   end
 
@@ -31,6 +35,14 @@ module Rukawa::State
     def self.color
       :yellow
     end
+
+    def self.merge(other)
+      if other == Finished
+        self
+      else
+        other
+      end
+    end
   end
 
   module Error
@@ -38,6 +50,14 @@ module Rukawa::State
 
     def self.color
       :red
+    end
+
+    def self.merge(other)
+      if other == Running
+        other
+      else
+        self
+      end
     end
   end
 

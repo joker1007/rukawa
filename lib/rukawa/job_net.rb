@@ -1,8 +1,7 @@
-require 'rukawa/dag_node'
+require 'rukawa/abstract_job'
 
 module Rukawa
-  class JobNet
-    include DagNode
+  class JobNet < AbstractJob
     include Enumerable
     attr_reader :dag
 
@@ -13,21 +12,36 @@ module Rukawa
     end
 
     def initialize(variables = {})
-      super
       @variables = variables
-      @dag = Dag.new(self.class.dependencies)
+      @dag = Dag.new(self, self.class.dependencies)
     end
 
-    def inner_dataflows
-      @dag.map(&:dataflow)
+    def dataflows
+      flat_map do |j|
+        if j.respond_to?(:dataflows)
+          j.dataflows
+        else
+          [j.dataflow]
+        end
+      end
     end
 
-    def run
-      inner_dataflows.each(&:execute).each(&:wait)
+    def state
+      inject(Rukawa::State::Waiting) do |state, j|
+        state.merge(j.state)
+      end
     end
 
     def output_dot(filename)
       File.open(filename, 'w') { |f| f.write(to_dot) }
+    end
+
+    def nodes_as_from
+      leaves
+    end
+
+    def nodes_as_to
+      roots
     end
 
     def to_dot(subgraph = false)
@@ -37,17 +51,10 @@ module Rukawa
       buf += "color = blue;\n" if subgraph
       dag.each do |j|
         buf += j.to_dot_def
+      end
 
-        j.out_jobs.each do |_j|
-          from_nodes = j.to_dot_from_nodes
-          to_nodes = _j.to_dot_to_nodes
-
-          from_nodes.each do |from|
-            to_nodes.each do |to|
-              buf += "#{from} -> #{to};\n"
-            end
-          end
-        end
+      dag.edges.each do |edge|
+        buf += "#{edge.from.name} -> #{edge.to.name};\n"
       end
       buf += "}\n"
     end
@@ -56,16 +63,8 @@ module Rukawa
       to_dot(true)
     end
 
-    def to_dot_from_nodes
-      dag.leaves.map(&:name)
-    end
-
-    def to_dot_to_nodes
-      dag.root.out_jobs.map(&:name)
-    end
-
-    def root
-      @dag.root
+    def roots
+      @dag.roots
     end
 
     def leaves
@@ -80,6 +79,10 @@ module Rukawa
 
     def children_errors
       inner_dataflows.map(&:reason).compact
+    end
+
+    def executor
+      Concurrent.global_io_executor
     end
   end
 end

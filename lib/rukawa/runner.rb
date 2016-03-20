@@ -16,8 +16,8 @@ module Rukawa
 
     def run(batch_mode = false, refresh_interval = DEFAULT_REFRESH_INTERVAL)
       Rukawa.logger.info("=== Start Rukawa ===")
-      future = @root_job_net.dataflow.tap(&:execute)
-      until future.complete?
+      futures = @root_job_net.dataflows.each(&:execute)
+      until futures.all?(&:complete?)
         display_table unless batch_mode
         sleep refresh_interval
       end
@@ -55,7 +55,7 @@ module Rukawa
           table_row(table, inner_j, level + 1)
         end
       else
-        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored]
+        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored + " #{job.dataflow.state}"]
       end
     end
 
