@@ -25,10 +25,11 @@ module Rukawa
 
       display_table unless batch_mode
 
-      collect_errors(@root_job_net)
+      errors = futures.map(&:reason).compact
 
-      unless @errors.empty?
-        @errors.each do |err|
+      unless errors.empty?
+        errors.each do |err|
+          next if err.is_a?(DependentJobFailure)
           Rukawa.logger.error(err)
         end
         return false
@@ -56,16 +57,6 @@ module Rukawa
         end
       else
         table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored]
-      end
-    end
-
-    def collect_errors(job_net)
-      job_net.each do |j|
-        if j.is_a?(JobNet)
-          collect_errors(j)
-        else
-          @errors << j.dataflow.reason if j.dataflow.reason
-        end
       end
     end
   end
