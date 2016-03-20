@@ -13,6 +13,7 @@ describe Rukawa do
       Job4 => an_instance_of(Time),
       InnerJob3 => an_instance_of(Time),
       InnerJob1 => an_instance_of(Time),
+      InnerJob4 => an_instance_of(Time),
     })
 
     expect(ExecuteLog.store[Job2]).to satisfy { |v| v > ExecuteLog.store[Job1] }
@@ -21,5 +22,6 @@ describe Rukawa do
     expect(ExecuteLog.store[Job4]).to satisfy { |v| v > ExecuteLog.store[Job3] }
     expect(ExecuteLog.store[InnerJob3]).to satisfy { |v| v > ExecuteLog.store[Job3] }
     expect(ExecuteLog.store[InnerJob1]).to satisfy { |v| v > ExecuteLog.store[Job3] }
+    expect(ExecuteLog.store[InnerJob4]).to satisfy { |v| v > ExecuteLog.store[Job4] }
   end
 end

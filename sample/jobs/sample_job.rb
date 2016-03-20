@@ -42,3 +42,13 @@ end
 
 class InnerJob3 < SampleJob
 end
+
+class InnerJob4 < SampleJob
+end
+
+class InnerJob5 < SampleJob
+  add_skip_rule ->(job) { job.is_a?(SampleJob) }
+end
+
+class InnerJob6 < SampleJob
+end
