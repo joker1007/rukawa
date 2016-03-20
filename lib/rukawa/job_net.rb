@@ -74,15 +74,5 @@ module Rukawa
     def each(&block)
       @dag.each(&block)
     end
-
-    private
-
-    def children_errors
-      inner_dataflows.map(&:reason).compact
-    end
-
-    def executor
-      Concurrent.global_io_executor
-    end
   end
 end

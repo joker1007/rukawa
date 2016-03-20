@@ -21,19 +21,10 @@ module Rukawa
       out_goings.empty?
     end
 
-    def set_state(name)
-      @state = Rukawa::State.get(name)
-    end
-
-    def store(key, value)
-      Rukawa.store[self.class] ||= Concurrent::Hash.new
-      Rukawa.store[self.class][key] = value
-    end
-
     def dataflow
       return @dataflow if @dataflow
 
-      @dataflow = Concurrent.dataflow_with(executor, *depend_dataflows) do |*results|
+      @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         begin
           raise DependentJobFailure unless results.all? { |r| !r.nil? }
 
@@ -57,20 +48,13 @@ module Rukawa
       end
     end
 
-    def complete?
-      dataflow.complete?
-    end
-
     def run
     end
 
     def nodes_as_from
       [self]
     end
-
-    def nodes_as_to
-      [self]
-    end
+    alias :nodes_as_to :nodes_as_from
 
     def to_dot_def
       if state == Rukawa::State::Waiting
@@ -80,14 +64,19 @@ module Rukawa
       end
     end
 
-    def executor
-      Rukawa.executor
-    end
-
     private
 
     def depend_dataflows
       in_comings.map { |edge| edge.from.dataflow }
+    end
+
+    def set_state(name)
+      @state = Rukawa::State.get(name)
+    end
+
+    def store(key, value)
+      Rukawa.store[self.class] ||= Concurrent::Hash.new
+      Rukawa.store[self.class][key] = value
     end
   end
 end
