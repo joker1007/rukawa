@@ -15,8 +15,33 @@ class InnerJobNet2 < Rukawa::JobNet
     def dependencies
       {
         InnerJob4 => [],
-        InnerJob5 => [],
+        InnerJob5 => [InnerJob4],
         InnerJob6 => [InnerJob4, InnerJob5],
+      }
+    end
+  end
+end
+
+class InnerJobNet3 < Rukawa::JobNet
+  class << self
+    def dependencies
+      {
+        InnerJob7 => [],
+        InnerJob8 => [],
+        InnerJob9 => [InnerJob7, InnerJob8],
+        InnerJob10 => [InnerJob7, InnerJob8],
+      }
+    end
+  end
+end
+
+class InnerJobNet4 < Rukawa::JobNet
+  class << self
+    def dependencies
+      {
+        InnerJob11 => [],
+        InnerJob12 => [],
+        InnerJob13 => [],
       }
     end
   end
@@ -35,6 +60,8 @@ class SampleJobNet < Rukawa::JobNet
         Job6 => [Job4, Job5],
         Job7 => [Job6],
         InnerJobNet2 => [Job4],
+        InnerJobNet3 => [Job8, Job7],
+        InnerJobNet4 => [InnerJobNet3],
       }
     end
   end

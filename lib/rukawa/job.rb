@@ -6,7 +6,7 @@ module Rukawa
     attr_accessor :in_comings, :out_goings
     attr_reader :state
 
-    def initialize(job_net)
+    def initialize(job_net, variables = {})
       @job_net = job_net
       @in_comings = Set.new
       @out_goings = Set.new
@@ -14,11 +14,11 @@ module Rukawa
     end
 
     def root?
-      in_comings.empty?
+      in_comings.select { |edge| edge.cluster == @job_net }.empty?
     end
 
     def leaf?
-      out_goings.empty?
+      out_goings.select { |edge| edge.cluster == @job_net }.empty?
     end
 
     def dataflow
@@ -58,9 +58,9 @@ module Rukawa
 
     def to_dot_def
       if state == Rukawa::State::Waiting
-        ""
+        "#{name};\n"
       else
-        "#{name} [color = #{state.color}];\n" unless state == Rukawa::State::Waiting
+        "#{name} [color = #{state.color}];\n"
       end
     end
 

@@ -52,3 +52,24 @@ end
 
 class InnerJob6 < SampleJob
 end
+
+class InnerJob7 < SampleJob
+end
+
+class InnerJob8 < SampleJob
+end
+
+class InnerJob9 < SampleJob
+end
+
+class InnerJob10 < SampleJob
+end
+
+class InnerJob11 < SampleJob
+end
+
+class InnerJob12 < SampleJob
+end
+
+class InnerJob13 < SampleJob
+end

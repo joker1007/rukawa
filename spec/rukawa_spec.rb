@@ -5,7 +5,7 @@ describe Rukawa do
     Rukawa.configure do |c|
       c.log_file = STDOUT
     end
-    Rukawa::Runner.run(SampleJobNet.new, true)
+    Rukawa::Runner.run(SampleJobNet.new(nil), true)
     expect(ExecuteLog.store).to match({
       Job1 => an_instance_of(Time),
       Job2 => an_instance_of(Time),

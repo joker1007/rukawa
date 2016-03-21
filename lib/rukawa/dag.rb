@@ -18,13 +18,11 @@ module Rukawa
         dependencies[job_class].each do |depend_job_class|
           depend_job = @jobs.find { |j| j.instance_of?(depend_job_class) }
 
-          depend_job.nodes_as_from.each do |from|
-            job.nodes_as_to.each do |to|
-              edge = Edge.new(from, to)
-              @edges << edge
-              from.out_goings << edge
-              to.in_comings << edge
-            end
+          depend_job.nodes_as_from.product(job.nodes_as_to).each do |from, to|
+            edge = Edge.new(from, to, job_net)
+            @edges << edge
+            from.out_goings << edge
+            to.in_comings << edge
           end
         end
       end

@@ -11,7 +11,7 @@ module Rukawa
       end
     end
 
-    def initialize(variables = {})
+    def initialize(_job_net, variables = {})
       @variables = variables
       @dag = Dag.new(self, self.class.dependencies)
     end

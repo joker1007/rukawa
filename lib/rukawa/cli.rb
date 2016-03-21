@@ -20,7 +20,7 @@ module Rukawa
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
-      job_net = job_net_class.new(options[:variables])
+      job_net = job_net_class.new(nil, options[:variables])
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
@@ -37,7 +37,7 @@ module Rukawa
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
-      job_net = job_net_class.new(options[:variables])
+      job_net = job_net_class.new(nil, options[:variables])
       job_net.output_dot(options[:output])
     end
 
