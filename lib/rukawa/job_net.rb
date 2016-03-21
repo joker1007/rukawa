@@ -46,7 +46,7 @@ module Rukawa
 
     def to_dot(subgraph = false)
       graphdef = subgraph ? "subgraph" : "digraph"
-      buf = "#{graphdef} #{subgraph ? "cluster_" : ""}#{name} {\n"
+      buf = %Q|#{graphdef} "#{subgraph ? "cluster_" : ""}#{name}" {\n|
       buf += %Q{label = "#{name}";\n}
       buf += "color = blue;\n" if subgraph
       dag.each do |j|
@@ -54,7 +54,7 @@ module Rukawa
       end
 
       dag.edges.each do |edge|
-        buf += "#{edge.from.name} -> #{edge.to.name};\n"
+        buf += %Q|"#{edge.from.name}" -> "#{edge.to.name}";\n|
       end
       buf += "}\n"
     end
