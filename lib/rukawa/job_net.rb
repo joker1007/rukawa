@@ -48,6 +48,8 @@ module Rukawa
       graphdef = subgraph ? "subgraph" : "digraph"
       buf = %Q|#{graphdef} "#{subgraph ? "cluster_" : ""}#{name}" {\n|
       buf += %Q{label = "#{name}";\n}
+      buf += Rukawa.config.graph.attrs
+      buf += Rukawa.config.graph.node.attrs
       buf += "color = blue;\n" if subgraph
       dag.each do |j|
         buf += j.to_dot_def

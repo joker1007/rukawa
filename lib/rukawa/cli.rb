@@ -7,6 +7,7 @@ module Rukawa
     map "run" => "_run"
     method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
+    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
     method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
@@ -14,6 +15,7 @@ module Rukawa
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name)
+      load_config
       Rukawa.configure do |c|
         c.log_file = options[:stdout] ? $stdout : options[:log]
         c.concurrency = options[:concurrency] if options[:concurrency]
@@ -32,9 +34,11 @@ module Rukawa
     end
 
     desc "graph JOB_NET_NAME", "Output jobnet graph"
+    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: []
     method_option :output, aliases: "-o", type: :string, required: true
     def graph(job_net_name)
+      load_config
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
@@ -43,6 +47,18 @@ module Rukawa
     end
 
     private
+
+    def load_config
+      if options[:config]
+        load File.expand_path(options[:config], Dir.pwd)
+      else
+        load default_config_file if File.exists?(default_config_file)
+      end
+    end
+
+    def default_config_file
+      "./rukawa.rb"
+    end
 
     def default_job_dirs
       [File.join(Dir.pwd, "job_nets"), File.join(Dir.pwd, "jobs")]
