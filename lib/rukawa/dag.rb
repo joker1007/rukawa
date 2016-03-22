@@ -3,6 +3,7 @@ require 'set'
 module Rukawa
   class Dag
     include Enumerable
+    include TSort
 
     attr_reader :nodes, :jobs, :edges
 
@@ -44,6 +45,24 @@ module Rukawa
         @nodes.each { |j| yield j }
       else
         @nodes.each
+      end
+    end
+
+    def tsort_each_node(&block)
+      @jobs.each(&block)
+    end
+
+    def tsort_each_child(node)
+      if block_given?
+        node.out_goings.each do |edge|
+          yield edge.to
+        end
+      else
+        Enumerator.new do |y|
+          node.out_goings.each do |edge|
+            y << edge.to
+          end
+        end
       end
     end
 

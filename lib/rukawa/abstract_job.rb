@@ -17,6 +17,10 @@ module Rukawa
       self.class.to_s
     end
 
+    def inspect
+      to_s
+    end
+
     def skip?
       skip_rules.inject(false) do |cond, rule|
         cond || rule.is_a?(Symbol) ? method(rule).call : rule.call(self)
