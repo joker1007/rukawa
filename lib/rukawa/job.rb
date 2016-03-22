@@ -4,7 +4,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class Job < AbstractJob
     attr_accessor :in_comings, :out_goings
-    attr_reader :parent_job_net, :state
+    attr_reader :state
 
     def initialize(parent_job_net)
       @parent_job_net = parent_job_net
@@ -28,7 +28,7 @@ module Rukawa
         begin
           raise DependentJobFailure unless results.all? { |r| !r.nil? }
 
-          if skip? || @parent_job_net.skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
+          if skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
             Rukawa.logger.info("Skip #{self.class}")
             set_state(:skipped)
           else

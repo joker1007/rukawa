@@ -3,7 +3,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class JobNet < AbstractJob
     include Enumerable
-    attr_reader :parent_job_net, :dag
+    attr_reader :dag
 
     class << self
       def dependencies

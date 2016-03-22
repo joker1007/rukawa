@@ -3,6 +3,8 @@ require 'rukawa/state'
 
 module Rukawa
   class AbstractJob
+    attr_reader :parent_job_net
+
     class << self
       def skip_rules
         @skip_rules ||= []
@@ -22,7 +24,8 @@ module Rukawa
     end
 
     def skip?
-      skip_rules.inject(false) do |cond, rule|
+      parent_skip = @parent_job_net ? @parent_job_net.skip? : false
+      parent_skip || skip_rules.inject(false) do |cond, rule|
         cond || rule.is_a?(Symbol) ? method(rule).call : rule.call(self)
       end
     end
