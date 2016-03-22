@@ -60,7 +60,7 @@ module Rukawa
       if state == Rukawa::State::Waiting
         "#{name};\n"
       else
-        "#{name} [color = #{state.color}];\n"
+        "#{name} [style = filled,fillcolor = #{state.color}];\n"
       end
     end
 
