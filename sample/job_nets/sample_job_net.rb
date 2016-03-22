@@ -42,6 +42,18 @@ class InnerJobNet4 < Rukawa::JobNet
         InnerJob11 => [],
         InnerJob12 => [],
         InnerJob13 => [],
+        NestedJobNet => [InnerJob11, InnerJob12],
+      }
+    end
+  end
+end
+
+class NestedJobNet < Rukawa::JobNet
+  class << self
+    def dependencies
+      {
+        NestedJob1 => [],
+        NestedJob2 => [NestedJob1],
       }
     end
   end

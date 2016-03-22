@@ -4,21 +4,21 @@ require 'rukawa/abstract_job'
 module Rukawa
   class Job < AbstractJob
     attr_accessor :in_comings, :out_goings
-    attr_reader :state
+    attr_reader :parent_job_net, :state
 
-    def initialize(job_net, variables = {})
-      @job_net = job_net
+    def initialize(parent_job_net)
+      @parent_job_net = parent_job_net
       @in_comings = Set.new
       @out_goings = Set.new
       set_state(:waiting)
     end
 
     def root?
-      in_comings.select { |edge| edge.cluster == @job_net }.empty?
+      in_comings.select { |edge| edge.cluster == @parent_job_net }.empty?
     end
 
     def leaf?
-      out_goings.select { |edge| edge.cluster == @job_net }.empty?
+      out_goings.select { |edge| edge.cluster == @parent_job_net }.empty?
     end
 
     def dataflow
@@ -28,7 +28,7 @@ module Rukawa
         begin
           raise DependentJobFailure unless results.all? { |r| !r.nil? }
 
-          if skip? || @job_net.skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
+          if skip? || @parent_job_net.skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
             Rukawa.logger.info("Skip #{self.class}")
             set_state(:skipped)
           else
@@ -51,10 +51,10 @@ module Rukawa
     def run
     end
 
-    def nodes_as_from
+    def jobs_as_from
       [self]
     end
-    alias :nodes_as_to :nodes_as_from
+    alias :jobs_as_to :jobs_as_from
 
     def to_dot_def
       if state == Rukawa::State::Waiting

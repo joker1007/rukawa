@@ -3,7 +3,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class JobNet < AbstractJob
     include Enumerable
-    attr_reader :dag
+    attr_reader :parent_job_net, :dag
 
     class << self
       def dependencies
@@ -11,9 +11,18 @@ module Rukawa
       end
     end
 
-    def initialize(_job_net, variables = {})
-      @variables = variables
-      @dag = Dag.new(self, self.class.dependencies)
+    def initialize(parent_job_net, *resume_job_classes)
+      @parent_job_net = parent_job_net
+      @dag = Dag.new
+      @dag.build(self, self.class.dependencies)
+    end
+
+    def toplevel?
+      @parent_job_net.nil?
+    end
+
+    def subgraph?
+      !toplevel?
     end
 
     def dataflows
@@ -34,14 +43,6 @@ module Rukawa
 
     def output_dot(filename)
       File.open(filename, 'w') { |f| f.write(to_dot) }
-    end
-
-    def nodes_as_from
-      leaves
-    end
-
-    def nodes_as_to
-      roots
     end
 
     def to_dot(subgraph = false)
@@ -65,12 +66,12 @@ module Rukawa
       to_dot(true)
     end
 
-    def roots
-      @dag.roots
+    def jobs_as_to
+      @dag.jobs.select { |j| j.in_comings.select { |edge| edge.cluster == self }.empty? && j.root? }
     end
 
-    def leaves
-      @dag.leaves
+    def jobs_as_from
+      @dag.jobs.select { |j| j.out_goings.select { |edge| edge.cluster == self }.empty? && j.leaf? }
     end
 
     def each(&block)

@@ -73,3 +73,9 @@ end
 
 class InnerJob13 < SampleJob
 end
+
+class NestedJob1 < SampleJob
+end
+
+class NestedJob2 < SampleJob
+end

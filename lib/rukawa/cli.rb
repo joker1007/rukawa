@@ -3,7 +3,7 @@ require 'rukawa/runner'
 
 module Rukawa
   class Cli < Thor
-    desc "run JOB_NET_NAME", "Run jobnet"
+    desc "run JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Run jobnet. If JOB_NET is set, resume from JOB_NAME"
     map "run" => "_run"
     method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
@@ -14,7 +14,7 @@ module Rukawa
     method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
-    def _run(job_net_name)
+    def _run(job_net_name, *job_name)
       load_config
       Rukawa.configure do |c|
         c.log_file = options[:stdout] ? $stdout : options[:log]
@@ -23,7 +23,8 @@ module Rukawa
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
-      job_net = job_net_class.new(nil, options[:variables])
+      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_net = job_net_class.new(nil, *job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
