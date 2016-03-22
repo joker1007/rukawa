@@ -10,11 +10,12 @@ module Rukawa
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
     method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name)
       Rukawa.configure do |c|
-        c.log_file = options[:log]
+        c.log_file = options[:stdout] ? $stdout : options[:log]
         c.concurrency = options[:concurrency] if options[:concurrency]
       end
       load_job_definitions
