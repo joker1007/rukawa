@@ -26,13 +26,7 @@ module Rukawa
     end
 
     def dataflows
-      flat_map do |j|
-        if j.respond_to?(:dataflows)
-          j.dataflows
-        else
-          [j.dataflow]
-        end
-      end
+      @dag.tsort.reverse.map(&:dataflow)
     end
 
     def state
