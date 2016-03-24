@@ -1,4 +1,5 @@
 require 'set'
+require 'tsort'
 
 module Rukawa
   class Dag
