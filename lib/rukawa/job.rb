@@ -13,6 +13,10 @@ module Rukawa
       set_state(:waiting)
     end
 
+    def set_state(name)
+      @state = Rukawa::State.get(name)
+    end
+
     def root?
       in_comings.select { |edge| edge.cluster == @parent_job_net }.empty?
     end
@@ -23,12 +27,13 @@ module Rukawa
 
     def dataflow
       return @dataflow if @dataflow
+      return @dataflow = bypass_dataflow if @state.bypassed?
 
       @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         begin
           raise DependentJobFailure unless results.all? { |r| !r.nil? }
 
-          if skip? || results.any? { |r| r == Rukawa::State.get(:skipped) }
+          if skip? || results.any?(&:skipped?)
             Rukawa.logger.info("Skip #{self.class}")
             set_state(:skipped)
           else
@@ -70,8 +75,11 @@ module Rukawa
       in_comings.map { |edge| edge.from.dataflow }
     end
 
-    def set_state(name)
-      @state = Rukawa::State.get(name)
+    def bypass_dataflow
+      Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
+        Rukawa.logger.info("Skip #{self.class}")
+        @state
+      end
     end
 
     def store(key, value)

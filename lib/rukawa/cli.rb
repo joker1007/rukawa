@@ -38,12 +38,13 @@ module Rukawa
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: []
     method_option :output, aliases: "-o", type: :string, required: true
-    def graph(job_net_name)
+    def graph(job_net_name, *job_name)
       load_config
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
-      job_net = job_net_class.new(nil, options[:variables])
+      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_net = job_net_class.new(nil, *job_classes)
       job_net.output_dot(options[:output])
     end
 

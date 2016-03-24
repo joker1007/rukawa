@@ -15,6 +15,21 @@ module Rukawa
       @parent_job_net = parent_job_net
       @dag = Dag.new
       @dag.build(self, self.class.dependencies)
+      @resume_job_classes = resume_job_classes
+
+      unless resume_job_classes.empty?
+        resume_targets = []
+        @dag.tsort_each_node do |node|
+          node.set_state(:bypassed)
+          resume_targets << node if resume_job_classes.include?(node.class)
+        end
+
+        resume_targets.each do |node|
+          @dag.each_strongly_connected_component_from(node) do |nodes|
+            nodes.each { |connected| connected.set_state(:waiting) }
+          end
+        end
+      end
     end
 
     def toplevel?
@@ -42,7 +57,7 @@ module Rukawa
     def to_dot(subgraph = false)
       graphdef = subgraph ? "subgraph" : "digraph"
       buf = %Q|#{graphdef} "#{subgraph ? "cluster_" : ""}#{name}" {\n|
-      buf += %Q{label = "#{name}";\n}
+      buf += %Q{label = "#{graph_label}";\n}
       buf += Rukawa.config.graph.attrs
       buf += Rukawa.config.graph.node.attrs
       buf += "color = blue;\n" if subgraph
@@ -70,6 +85,16 @@ module Rukawa
 
     def each(&block)
       @dag.each(&block)
+    end
+
+    private
+
+    def graph_label
+      if @resume_job_classes.empty?
+        name
+      else
+        "#{name} resume from (#{@resume_job_classes.join(", ")})"
+      end
     end
   end
 end

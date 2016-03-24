@@ -15,6 +15,12 @@ module Rukawa::State
     def merge(other)
       other
     end
+
+    %i(running? skipped? bypassed? error? waiting? finished?).each do |sym|
+      define_method(sym) do
+        false
+      end
+    end
   end
 
   module Running
@@ -26,6 +32,10 @@ module Rukawa::State
 
     def self.merge(_other)
       self
+    end
+
+    def self.running?
+      true
     end
   end
 
@@ -43,6 +53,22 @@ module Rukawa::State
         other
       end
     end
+
+    def self.skipped?
+      true
+    end
+  end
+
+  module Bypassed
+    extend BaseExt
+
+    def self.color
+      :yellow
+    end
+
+    def self.bypassed?
+      true
+    end
   end
 
   module Error
@@ -59,6 +85,10 @@ module Rukawa::State
         self
       end
     end
+
+    def self.error?
+      true
+    end
   end
 
   module Waiting
@@ -67,6 +97,10 @@ module Rukawa::State
     def self.color
       :default
     end
+
+    def self.waiting?
+      true
+    end
   end
 
   module Finished
@@ -74,6 +108,10 @@ module Rukawa::State
 
     def self.color
       :green
+    end
+
+    def self.finished?
+      true
     end
   end
 end
