@@ -48,6 +48,36 @@ module Rukawa
       job_net.output_dot(options[:output])
     end
 
+    desc "run_job JOB_NAME [JOB_NAME] ...", "Run specific jobs."
+    method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
+    method_option :variables, type: :hash, default: {}
+    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
+    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
+    method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
+    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
+    method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
+    method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
+    def run_job(*job_name)
+      load_config
+      Rukawa.configure do |c|
+        c.log_file = options[:stdout] ? $stdout : options[:log]
+        c.concurrency = options[:concurrency] if options[:concurrency]
+      end
+      load_job_definitions
+
+      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_net_class = anonymous_job_net_class(*job_classes)
+      job_net = job_net_class.new(nil)
+      result = Runner.run(job_net, options[:batch], options[:refresh_interval])
+
+      if options[:dot]
+        job_net.output_dot(options[:dot])
+      end
+
+      exit 1 unless result
+    end
+
     private
 
     def load_config
@@ -70,6 +100,16 @@ module Rukawa
       job_dirs = (default_job_dirs + options[:job_dirs]).map { |d| File.expand_path(d) }.uniq
       job_dirs.each do |dir|
         Dir.glob(File.join(dir, "**/*.rb")) { |f| load f }
+      end
+    end
+
+    def anonymous_job_net_class(*job_classes)
+      Class.new(JobNet) do
+        self.singleton_class.send(:define_method, :dependencies) do
+          job_classes.map { |klass| [klass, []] }.to_h
+        end
+
+        define_method(:name) { "AnonymousJobNet" }
       end
     end
   end
