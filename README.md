@@ -112,6 +112,106 @@ See [sample/job_nets/sample_job_net.rb](https://github.com/joker1007/rukawa/blob
 
 ![jobnet.png](https://raw.githubusercontent.com/joker1007/rukawa/master/sample/result.png)
 
+### Resume
+
+Add `JOB_NAME` arguments to `run` command.
+
+```
+% bundle exec rukawa run SampleJobNet Job8 InnerJob4 -r 5 -c 10
++----------------+----------+
+| Job            | Status   |
++----------------+----------+
+| Job1           | bypassed |
+| Job2           | bypassed |
+| Job3           | bypassed |
+| Job4           | bypassed |
+| InnerJobNet    | bypassed |
+|   InnerJob3    | bypassed |
+|   InnerJob1    | bypassed |
+|   InnerJob2    | bypassed |
+| Job8           | waiting  |
+| Job5           | bypassed |
+| Job6           | bypassed |
+| Job7           | bypassed |
+| InnerJobNet2   | waiting  |
+|   InnerJob4    | waiting  |
+|   InnerJob5    | waiting  |
+|   InnerJob6    | waiting  |
+| InnerJobNet3   | waiting  |
+|   InnerJob7    | waiting  |
+|   InnerJob8    | waiting  |
+|   InnerJob9    | waiting  |
+|   InnerJob10   | waiting  |
+| InnerJobNet4   | waiting  |
+|   InnerJob11   | waiting  |
+|   InnerJob12   | waiting  |
+|   InnerJob13   | waiting  |
+|   NestedJobNet | waiting  |
+|     NestedJob1 | waiting  |
+|     NestedJob2 | waiting  |
++----------------+----------+
++----------------+----------+
+| Job            | Status   |
++----------------+----------+
+| Job1           | bypassed |
+| Job2           | bypassed |
+| Job3           | bypassed |
+| Job4           | bypassed |
+| InnerJobNet    | bypassed |
+|   InnerJob3    | bypassed |
+|   InnerJob1    | bypassed |
+|   InnerJob2    | bypassed |
+| Job8           | finished |
+| Job5           | bypassed |
+| Job6           | bypassed |
+| Job7           | bypassed |
+| InnerJobNet2   | skipped  |
+|   InnerJob4    | finished |
+|   InnerJob5    | skipped  |
+|   InnerJob6    | skipped  |
+| InnerJobNet3   | running  |
+|   InnerJob7    | finished |
+|   InnerJob8    | running  |
+|   InnerJob9    | waiting  |
+|   InnerJob10   | waiting  |
+| InnerJobNet4   | waiting  |
+|   InnerJob11   | waiting  |
+|   InnerJob12   | waiting  |
+|   InnerJob13   | waiting  |
+|   NestedJobNet | waiting  |
+|     NestedJob1 | waiting  |
+|     NestedJob2 | waiting  |
++----------------+----------+
+```
+
+In above case, All jobs except `Job8` and `InnerJob4` and depending them are set `bypassed`.
+`bypassed` means that job is not executed, and regarded as successful.
+For example, a job depends two other jobs. Even if either job is `bypassed`, and another job is `finished`, it is executed.
+
+
+### Run Specific jobs
+
+`run_job` command executes specified job forcely.
+
+```
+% be rukawa run_job Job8 InnerJob6 NestedJob1 -c 3 -r 5
++------------+---------+
+| Job        | Status  |
++------------+---------+
+| Job8       | waiting |
+| InnerJob6  | waiting |
+| NestedJob1 | running |
++------------+---------+
++------------+----------+
+| Job        | Status   |
++------------+----------+
+| Job8       | finished |
+| InnerJob6  | finished |
+| NestedJob1 | finished |
++------------+----------+
+```
+
+Main usage is manual reentering.
 
 ### Output jobnet graph (dot file)
 
@@ -124,18 +224,53 @@ See [sample/job_nets/sample_job_net.rb](https://github.com/joker1007/rukawa/blob
 ```
 % bundle exec rukawa help run
 Usage:
-  rukawa run JOB_NET_NAME
+  rukawa run JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...
 
 Options:
   -c, [--concurrency=N]           # Default: cpu count
       [--variables=key:value]
+      [--config=CONFIG]           # If this options is not set, try to load ./rukawa.rb
       [--job-dirs=one two three]  # Load job directories
   -b, [--batch], [--no-batch]     # If batch mode, not display running status
   -l, [--log=LOG]
                                   # Default: ./rukawa.log
+      [--stdout], [--no-stdout]   # Output log to stdout
   -d, [--dot=DOT]                 # Output job status by dot format
   -r, [--refresh-interval=N]      # Refresh interval for running status information
                                   # Default: 3
+
+Run jobnet. If JOB_NET is set, resume from JOB_NAME
+
+
+% bundle exec rukawa help run_job
+Usage:
+  rukawa run_job JOB_NAME [JOB_NAME] ...
+
+Options:
+  -c, [--concurrency=N]           # Default: cpu count
+      [--variables=key:value]
+      [--config=CONFIG]           # If this options is not set, try to load ./rukawa.rb
+      [--job-dirs=one two three]  # Load job directories
+  -b, [--batch], [--no-batch]     # If batch mode, not display running status
+  -l, [--log=LOG]
+                                  # Default: ./rukawa.log
+      [--stdout], [--no-stdout]   # Output log to stdout
+  -d, [--dot=DOT]                 # Output job status by dot format
+  -r, [--refresh-interval=N]      # Refresh interval for running status information
+                                  # Default: 3
+
+Run specific jobs.
+
+% bundle exec rukawa help graph
+Usage:
+  rukawa graph JOB_NET_NAME [JOB_NAME] [JOB_NAME] ... -o, --output=OUTPUT
+
+Options:
+      [--config=CONFIG]           # If this options is not set, try to load ./rukawa.rb
+      [--job-dirs=one two three]
+  -o, --output=OUTPUT
+
+Output jobnet graph. If JOB_NET is set, simulate resumed job sequence
 ```
 
 ## ToDo

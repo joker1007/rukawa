@@ -34,7 +34,7 @@ module Rukawa
       exit 1 unless result
     end
 
-    desc "graph JOB_NET_NAME", "Output jobnet graph"
+    desc "graph JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Output jobnet graph. If JOB_NET is set, simulate resumed job sequence"
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: []
     method_option :output, aliases: "-o", type: :string, required: true
