@@ -42,15 +42,16 @@ module Rukawa
     end
 
     def formatted_elapsed_time_from(time = Time.now)
-      sec = elapsed_time_from(time)
-      return "N/A" unless sec
+      elapsed = elapsed_time_from(time)
+      return "N/A" unless elapsed
 
-      hour = sec.to_i / 3600
-      min = sec.to_i / 60
+      hour = elapsed.to_i / 3600
+      min = elapsed.to_i / 60
+      sec = (elapsed - hour * 3600 - min * 60).to_i
 
       hour_format = min > 0 ? "%dh " % hour : ""
       min_format = min > 0 ? "%dm " % min : ""
-      sec_format = "#{sec.to_i}s"
+      sec_format = "#{sec}s"
       "#{hour_format}#{min_format}#{sec_format}"
     end
   end
