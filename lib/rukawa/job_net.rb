@@ -49,7 +49,7 @@ module Rukawa
     end
 
     def dataflows
-      @dag.tsort.reverse.map(&:dataflow)
+      @dag.leveled_each.map(&:dataflow)
     end
 
     def state
