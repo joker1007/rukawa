@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/joker1007/rukawa.png?label=ready&title=Ready)](https://waffle.io/joker1007/rukawa)
 # Rukawa
 [![Gem Version](https://badge.fury.io/rb/rukawa.svg)](https://badge.fury.io/rb/rukawa)
 [![Build Status](https://travis-ci.org/joker1007/rukawa.svg?branch=master)](https://travis-ci.org/joker1007/rukawa)
