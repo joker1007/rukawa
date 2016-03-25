@@ -44,73 +44,79 @@ See [sample/job_nets/sample_job_net.rb](https://github.com/joker1007/rukawa/blob
 % cd rukawa/sample
 
 # load ./jobs/**/*.rb, ./job_net/**/*.rb automatically
-% bundle exec rukawa run SampleJobNet -r 1 -d result.dot
-+--------------+---------+
-| Job          | Status  |
-+--------------+---------+
-| Job1         | waiting |
-| Job2         | waiting |
-| Job3         | waiting |
-| Job4         | waiting |
-| InnerJobNet  | waiting |
-|   InnerJob3  | waiting |
-|   InnerJob1  | waiting |
-|   InnerJob2  | waiting |
-| Job8         | waiting |
-| Job5         | waiting |
-| Job6         | waiting |
-| Job7         | waiting |
-| InnerJobNet2 | waiting |
-|   InnerJob4  | waiting |
-|   InnerJob5  | waiting |
-|   InnerJob6  | waiting |
-+--------------+---------+
-+--------------+----------+
-| Job          | Status   |
-+--------------+----------+
-| Job1         | finished |
-| Job2         | finished |
-| Job3         | finished |
-| Job4         | finished |
-| InnerJobNet  | running  |
-|   InnerJob3  | running  |
-|   InnerJob1  | running  |
-|   InnerJob2  | waiting  |
-| Job8         | waiting  |
-| Job5         | error    |
-| Job6         | error    |
-| Job7         | error    |
-| InnerJobNet2 | running  |
-|   InnerJob4  | running  |
-|   InnerJob5  | skipped  |
-|   InnerJob6  | waiting  |
-+--------------+----------+
-+--------------+----------+
-| Job          | Status   |
-+--------------+----------+
-| Job1         | finished |
-| Job2         | finished |
-| Job3         | finished |
-| Job4         | finished |
-| InnerJobNet  | error    |
-|   InnerJob3  | finished |
-|   InnerJob1  | finished |
-|   InnerJob2  | error    |
-| Job8         | error    |
-| Job5         | error    |
-| Job6         | error    |
-| Job7         | error    |
-| InnerJobNet2 | finished |
-|   InnerJob4  | finished |
-|   InnerJob5  | skipped  |
-|   InnerJob6  | skipped  |
-+--------------+----------+
+% bundle exec rukawa run SampleJobNet -r 10 -c 10
++----------------+----------+
+| Job            | Status   |
++----------------+----------+
+| Job1           | finished |
+| Job2           | waiting  |
+| Job3           | waiting  |
+| Job4           | waiting  |
+| InnerJobNet    | waiting  |
+|   InnerJob3    | waiting  |
+|   InnerJob1    | waiting  |
+|   InnerJob2    | waiting  |
+| Job8           | waiting  |
+| Job5           | waiting  |
+| Job6           | waiting  |
+| Job7           | waiting  |
+| InnerJobNet2   | waiting  |
+|   InnerJob4    | waiting  |
+|   InnerJob5    | waiting  |
+|   InnerJob6    | waiting  |
+| InnerJobNet3   | waiting  |
+|   InnerJob7    | waiting  |
+|   InnerJob8    | waiting  |
+|   InnerJob9    | waiting  |
+|   InnerJob10   | waiting  |
+| InnerJobNet4   | waiting  |
+|   InnerJob11   | waiting  |
+|   InnerJob12   | waiting  |
+|   InnerJob13   | waiting  |
+|   NestedJobNet | waiting  |
+|     NestedJob1 | waiting  |
+|     NestedJob2 | waiting  |
++----------------+----------+
++----------------+----------+
+| Job            | Status   |
++----------------+----------+
+| Job1           | finished |
+| Job2           | finished |
+| Job3           | finished |
+| Job4           | finished |
+| InnerJobNet    | error    |
+|   InnerJob3    | finished |
+|   InnerJob1    | finished |
+|   InnerJob2    | error    |
+| Job8           | aborted  |
+| Job5           | error    |
+| Job6           | aborted  |
+| Job7           | aborted  |
+| InnerJobNet2   | running  |
+|   InnerJob4    | running  |
+|   InnerJob5    | waiting  |
+|   InnerJob6    | waiting  |
+| InnerJobNet3   | aborted  |
+|   InnerJob7    | aborted  |
+|   InnerJob8    | aborted  |
+|   InnerJob9    | aborted  |
+|   InnerJob10   | aborted  |
+| InnerJobNet4   | aborted  |
+|   InnerJob11   | aborted  |
+|   InnerJob12   | aborted  |
+|   InnerJob13   | aborted  |
+|   NestedJobNet | aborted  |
+|     NestedJob1 | aborted  |
+|     NestedJob2 | aborted  |
++----------------+----------+
 
 # generate result graph image
 % dot -Tpng -o result.png result.dot
 ```
 
 ![jobnet.png](https://raw.githubusercontent.com/joker1007/rukawa/master/sample/result.png)
+
+`aborted` means that dependent job failure aborts following jobs.
 
 ### Resume
 
