@@ -11,7 +11,6 @@ module Rukawa
     def initialize
       @nodes = Set.new
       @jobs = Set.new
-      @start_jobs = Set.new
       @edges = Set.new
     end
 
@@ -22,7 +21,6 @@ module Rukawa
         job = job_class.new(job_net)
         @nodes << job
         @jobs << job if job.is_a?(Job)
-        @start_jobs << job if job.is_a?(Job) && dependencies[job_class].empty?
 
         dependencies[job_class].each do |depend_job_class|
           depend_job = @nodes.find { |j| j.instance_of?(depend_job_class) }
@@ -72,7 +70,7 @@ module Rukawa
     def leveled_each
       visited = Set.new
       queue = []
-      queue.push(*@start_jobs)
+      queue.push(*@jobs.select { |j| j.in_comings.empty? })
 
       if block_given?
         until queue.empty?
@@ -89,10 +87,6 @@ module Rukawa
           end
         end
       end
-    end
-
-    def start_jobs
-      @start_jobs
     end
 
     private
