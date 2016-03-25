@@ -33,5 +33,25 @@ module Rukawa
     def skip_rules
       self.class.skip_rules
     end
+
+    def elapsed_time_from(time = Time.now)
+      return finished_at - started_at if started_at && finished_at
+      return time - started_at if started_at
+
+      nil
+    end
+
+    def formatted_elapsed_time_from(time = Time.now)
+      sec = elapsed_time_from(time)
+      return "N/A" unless sec
+
+      hour = sec.to_i / 3600
+      min = sec.to_i / 60
+
+      hour_format = min > 0 ? "%dh " % hour : ""
+      min_format = min > 0 ? "%dm " % min : ""
+      sec_format = "#{sec.to_i}s"
+      "#{hour_format}#{min_format}#{sec_format}"
+    end
   end
 end

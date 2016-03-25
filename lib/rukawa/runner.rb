@@ -24,6 +24,7 @@ module Rukawa
       Rukawa.logger.info("=== Finish Rukawa ===")
 
       display_table unless batch_mode
+      puts "Finished #{@root_job_net.name} in #{@root_job_net.formatted_elapsed_time_from}"
 
       errors = futures.map(&:reason).compact
 
@@ -41,7 +42,7 @@ module Rukawa
     private
 
     def display_table
-      table = Terminal::Table.new headings: ["Job", "Status"] do |t|
+      table = Terminal::Table.new headings: ["Job", "Status", "Elapsed Time"] do |t|
         @root_job_net.each_with_index do |j|
           table_row(t, j)
         end
@@ -51,12 +52,12 @@ module Rukawa
 
     def table_row(table, job, level = 0)
       if job.is_a?(JobNet)
-        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], job.state.colored]
+        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], Paint[job.state.colored, :bold, :underline], Paint[job.formatted_elapsed_time_from, :bold, :underline]]
         job.each do |inner_j|
           table_row(table, inner_j, level + 1)
         end
       else
-        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored]
+        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored, job.formatted_elapsed_time_from]
       end
     end
   end
