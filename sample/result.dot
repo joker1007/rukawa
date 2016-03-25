@@ -1,0 +1,86 @@
+digraph "SampleJobNet" {
+label = "SampleJobNet";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+Job1 [style = filled,fillcolor = green];
+Job2 [style = filled,fillcolor = green];
+Job3 [style = filled,fillcolor = green];
+Job4 [style = filled,fillcolor = green];
+subgraph "cluster_InnerJobNet" {
+label = "InnerJobNet";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+color = blue;
+InnerJob3 [style = filled,fillcolor = green];
+InnerJob1 [style = filled,fillcolor = green];
+InnerJob2 [style = filled,fillcolor = red];
+"InnerJob1" -> "InnerJob2";
+"InnerJob3" -> "InnerJob2";
+}
+Job8 [style = filled,fillcolor = magenta];
+Job5 [style = filled,fillcolor = red];
+Job6 [style = filled,fillcolor = magenta];
+Job7 [style = filled,fillcolor = magenta];
+subgraph "cluster_InnerJobNet2" {
+label = "InnerJobNet2";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+color = blue;
+InnerJob4 [style = filled,fillcolor = green];
+InnerJob5 [style = filled,fillcolor = yellow];
+InnerJob6 [style = filled,fillcolor = yellow];
+"InnerJob4" -> "InnerJob5";
+"InnerJob4" -> "InnerJob6";
+"InnerJob5" -> "InnerJob6";
+}
+subgraph "cluster_InnerJobNet3" {
+label = "InnerJobNet3";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+color = blue;
+InnerJob7 [style = filled,fillcolor = magenta];
+InnerJob8 [style = filled,fillcolor = magenta];
+InnerJob9 [style = filled,fillcolor = magenta];
+InnerJob10 [style = filled,fillcolor = magenta];
+"InnerJob7" -> "InnerJob9";
+"InnerJob8" -> "InnerJob9";
+"InnerJob7" -> "InnerJob10";
+"InnerJob8" -> "InnerJob10";
+}
+subgraph "cluster_InnerJobNet4" {
+label = "InnerJobNet4";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+color = blue;
+InnerJob11 [style = filled,fillcolor = magenta];
+InnerJob12 [style = filled,fillcolor = magenta];
+InnerJob13 [style = filled,fillcolor = magenta];
+subgraph "cluster_NestedJobNet" {
+label = "NestedJobNet";
+graph [rankdir = LR,nodesep = 0.8,concentrate = true];
+color = blue;
+NestedJob1 [style = filled,fillcolor = magenta];
+NestedJob2 [style = filled,fillcolor = magenta];
+"NestedJob1" -> "NestedJob2";
+}
+"InnerJob11" -> "NestedJob1";
+"InnerJob12" -> "NestedJob1";
+}
+"Job1" -> "Job2";
+"Job1" -> "Job3";
+"Job2" -> "Job4";
+"Job3" -> "Job4";
+"Job3" -> "InnerJob3";
+"Job3" -> "InnerJob1";
+"InnerJob2" -> "Job8";
+"Job3" -> "Job5";
+"Job4" -> "Job6";
+"Job5" -> "Job6";
+"Job6" -> "Job7";
+"Job4" -> "InnerJob4";
+"Job8" -> "InnerJob7";
+"Job8" -> "InnerJob8";
+"Job7" -> "InnerJob7";
+"Job7" -> "InnerJob8";
+"InnerJob9" -> "InnerJob11";
+"InnerJob9" -> "InnerJob12";
+"InnerJob9" -> "InnerJob13";
+"InnerJob10" -> "InnerJob11";
+"InnerJob10" -> "InnerJob12";
+"InnerJob10" -> "InnerJob13";
+}

@@ -1,6 +1,6 @@
 module Rukawa::State
   def self.get(name)
-    const_get(name.to_s.capitalize)
+    const_get(name.to_s.split("_").map(&:capitalize).join)
   end
 
   module BaseExt
@@ -16,7 +16,7 @@ module Rukawa::State
       other
     end
 
-    %i(running? skipped? bypassed? error? waiting? finished?).each do |sym|
+    %i(running? skipped? bypassed? error? aborted? waiting? finished?).each do |sym|
       define_method(sym) do
         false
       end
@@ -87,6 +87,34 @@ module Rukawa::State
     end
 
     def self.error?
+      true
+    end
+  end
+
+  module Aborted
+    extend BaseExt
+
+    def name
+      "aborted"
+    end
+
+    def self.color
+      :magenta
+    end
+
+    def self.merge(other)
+      if other == Running || other == Error
+        other
+      else
+        self
+      end
+    end
+
+    def self.error?
+      true
+    end
+
+    def self.aborted?
       true
     end
   end

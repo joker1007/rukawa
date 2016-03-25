@@ -31,7 +31,7 @@ module Rukawa
 
       @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         begin
-          raise DependentJobFailure unless results.all? { |r| !r.nil? }
+          check_dependencies(results)
 
           if skip? || results.any?(&:skipped?)
             Rukawa.logger.info("Skip #{self.class}")
@@ -45,7 +45,7 @@ module Rukawa
           end
         rescue => e
           Rukawa.logger.error("Error #{self.class} by #{e}")
-          set_state(:error)
+          set_state(:error) unless e.is_a?(DependentJobFailure)
           raise
         end
 
@@ -79,6 +79,13 @@ module Rukawa
       Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
         Rukawa.logger.info("Skip #{self.class}")
         @state
+      end
+    end
+
+    def check_dependencies(results)
+      unless results.all? { |r| !r.nil? }
+        set_state(:aborted)
+        raise DependentJobFailure
       end
     end
 
