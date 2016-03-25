@@ -30,33 +30,33 @@ module Rukawa
       return @dataflow = bypass_dataflow if @state.bypassed?
 
       @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
-        begin
-          check_dependencies(results)
-
-          if skip? || results.any?(&:skipped?)
-            Rukawa.logger.info("Skip #{self.class}")
-            set_state(:skipped)
-          else
-            Rukawa.logger.info("Start #{self.class}")
-            set_state(:running)
-            @started_at = Time.now
-            run
-            @finished_at = Time.now
-            Rukawa.logger.info("Finish #{self.class}")
-            set_state(:finished)
-          end
-        rescue => e
-          @finished_at = Time.now
-          Rukawa.logger.error("Error #{self.class} by #{e}")
-          set_state(:error) unless e.is_a?(DependentJobFailure)
-          raise
-        end
-
+        do_run(*results)
         @state
       end
     end
 
     def run
+    end
+
+    private def do_run(*results)
+      @started_at = Time.now
+      check_dependencies(results)
+
+      if skip? || results.any?(&:skipped?)
+        Rukawa.logger.info("Skip #{self.class}")
+        set_state(:skipped)
+      else
+        Rukawa.logger.info("Start #{self.class}")
+        set_state(:running)
+        run
+        Rukawa.logger.info("Finish #{self.class}")
+        set_state(:finished)
+      end
+    rescue => e
+      handle_error(e)
+      raise
+    ensure
+      @finished_at = Time.now
     end
 
     def jobs_as_from
@@ -90,6 +90,11 @@ module Rukawa
         set_state(:aborted)
         raise DependentJobFailure
       end
+    end
+
+    def handle_error(e)
+      Rukawa.logger.error("Error #{self.class} by #{e}")
+      set_state(:error) unless e.is_a?(DependentJobFailure)
     end
 
     def store(key, value)
