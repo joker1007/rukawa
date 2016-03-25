@@ -4,7 +4,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class Job < AbstractJob
     attr_accessor :in_comings, :out_goings
-    attr_reader :state
+    attr_reader :state, :started_at, :finished_at
 
     def initialize(parent_job_net)
       @parent_job_net = parent_job_net
@@ -39,11 +39,14 @@ module Rukawa
           else
             Rukawa.logger.info("Start #{self.class}")
             set_state(:running)
+            @started_at = Time.now
             run
+            @finished_at = Time.now
             Rukawa.logger.info("Finish #{self.class}")
             set_state(:finished)
           end
         rescue => e
+          @finished_at = Time.now
           Rukawa.logger.error("Error #{self.class} by #{e}")
           set_state(:error) unless e.is_a?(DependentJobFailure)
           raise

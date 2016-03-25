@@ -32,6 +32,14 @@ module Rukawa
       end
     end
 
+    def started_at
+      @dag.nodes.min_by { |j| j.started_at ? j.started_at.to_i : Float::INFINITY }.started_at
+    end
+
+    def finished_at
+      @dag.nodes.max_by { |j| j.finished_at.to_i }.finished_at
+    end
+
     def toplevel?
       @parent_job_net.nil?
     end
