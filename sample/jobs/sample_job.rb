@@ -20,6 +20,8 @@ end
 class Job4 < SampleJob
 end
 class Job5 < SampleJob
+  set_retryable limit: 3, wait: 2, type: RuntimeError
+
   def run
     raise "job5 error"
   end
