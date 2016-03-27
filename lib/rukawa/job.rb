@@ -6,10 +6,22 @@ module Rukawa
     attr_accessor :in_comings, :out_goings
     attr_reader :state, :started_at, :finished_at
 
+    class << self
+      attr_reader :retryable, :retry_limit, :retry_exception_type, :retry_wait
+      def set_retryable(limit: 8, type: nil, wait: nil)
+        @retryable = true
+        @retry_limit = limit
+        @retry_exception_type = type
+        @retry_wait = wait
+      end
+    end
+
     def initialize(parent_job_net)
       @parent_job_net = parent_job_net
       @in_comings = Set.new
       @out_goings = Set.new
+      @retry_count = 0
+      @retry_wait = 1
       set_state(:waiting)
     end
 
@@ -54,7 +66,8 @@ module Rukawa
       end
     rescue => e
       handle_error(e)
-      raise
+      Rukawa.logger.error("Retry #{self.class}")
+      retry
     ensure
       @finished_at = Time.now
     end
@@ -94,7 +107,30 @@ module Rukawa
 
     def handle_error(e)
       Rukawa.logger.error("Error #{self.class} by #{e}")
-      set_state(:error) unless e.is_a?(DependentJobFailure)
+      if retry?(e)
+        @retry_count += 1
+        set_state(:waiting)
+        sleep @retry_wait
+        @retry_wait = self.class.retry_wait ? self.class.retry_wait : @retry_wait * 2
+      else
+        set_state(:error) unless e.is_a?(DependentJobFailure)
+        raise e
+      end
+    end
+
+    def retry?(e)
+      return false unless self.class.retryable
+
+      type_condition = case self.class.retry_exception_type
+      when Array
+        self.class.retry_exception_type.include?(e.class)
+      when Class
+        e.is_a?(self.class.retry_exception_type)
+      when nil
+        !e.is_a?(DependentJobFailure)
+      end
+
+      type_condition && (self.class.retry_limit.nil? || self.class.retry_limit == 0 || @retry_count < self.class.retry_limit)
     end
 
     def store(key, value)
