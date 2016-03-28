@@ -14,10 +14,14 @@ end
 class Job1 < SampleJob
 end
 class Job2 < SampleJob
+  def run
+    raise "job2 error"
+  end
 end
 class Job3 < SampleJob
 end
 class Job4 < SampleJob
+  set_dependency_type :one_success
 end
 class Job5 < SampleJob
   set_retryable limit: 3, wait: 2, type: RuntimeError
@@ -27,6 +31,7 @@ class Job5 < SampleJob
   end
 end
 class Job6 < SampleJob
+  set_dependency_type :one_failed
 end
 class Job7 < SampleJob
 end

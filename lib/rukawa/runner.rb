@@ -30,7 +30,7 @@ module Rukawa
 
       unless errors.empty?
         errors.each do |err|
-          next if err.is_a?(DependentJobFailure)
+          next if err.is_a?(DependencyUnsatisfied)
           Rukawa.logger.error(err)
         end
         return false
