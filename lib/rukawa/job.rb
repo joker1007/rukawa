@@ -14,6 +14,14 @@ module Rukawa
         @retry_exception_type = type
         @retry_wait = wait
       end
+
+      def set_dependency_type(name)
+        @dependency_type = Rukawa::Dependency.get(name)
+      end
+
+      def dependency_type
+        @dependency_type || Rukawa::Dependency.get(:all_success)
+      end
     end
 
     def initialize(parent_job_net)
@@ -54,7 +62,7 @@ module Rukawa
       @started_at = Time.now
       check_dependencies(results)
 
-      if skip? || results.any?(&:skipped?)
+      if skip?
         Rukawa.logger.info("Skip #{self.class}")
         set_state(:skipped)
       else
@@ -98,10 +106,15 @@ module Rukawa
       end
     end
 
+    def dependency_type
+      self.class.dependency_type
+    end
+
     def check_dependencies(results)
-      unless results.all? { |r| !r.nil? }
+      dependency = dependency_type.new(*results)
+      unless dependency.resolve
         set_state(:aborted)
-        raise DependentJobFailure
+        raise DependencyUnsatisfied
       end
     end
 
@@ -113,7 +126,7 @@ module Rukawa
         sleep @retry_wait
         @retry_wait = self.class.retry_wait ? self.class.retry_wait : @retry_wait * 2
       else
-        set_state(:error) unless e.is_a?(DependentJobFailure)
+        set_state(:error) unless e.is_a?(DependencyUnsatisfied)
         raise e
       end
     end
@@ -127,7 +140,7 @@ module Rukawa
       when Class
         e.is_a?(self.class.retry_exception_type)
       when nil
-        !e.is_a?(DependentJobFailure)
+        !e.is_a?(DependencyUnsatisfied)
       end
 
       type_condition && (self.class.retry_limit.nil? || self.class.retry_limit == 0 || @retry_count < self.class.retry_limit)

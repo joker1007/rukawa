@@ -2,7 +2,7 @@ digraph "SampleJobNet" {
 label = "SampleJobNet";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 Job1 [style = filled,fillcolor = green];
-Job2 [style = filled,fillcolor = green];
+Job2 [style = filled,fillcolor = red];
 Job3 [style = filled,fillcolor = green];
 Job4 [style = filled,fillcolor = green];
 subgraph "cluster_InnerJobNet" {
@@ -17,15 +17,15 @@ InnerJob2 [style = filled,fillcolor = red];
 }
 Job8 [style = filled,fillcolor = magenta];
 Job5 [style = filled,fillcolor = red];
-Job6 [style = filled,fillcolor = magenta];
-Job7 [style = filled,fillcolor = magenta];
+Job6 [style = filled,fillcolor = green];
+Job7 [style = filled,fillcolor = green];
 subgraph "cluster_InnerJobNet2" {
 label = "InnerJobNet2";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
 InnerJob4 [style = filled,fillcolor = green];
 InnerJob5 [style = filled,fillcolor = yellow];
-InnerJob6 [style = filled,fillcolor = yellow];
+InnerJob6 [style = filled,fillcolor = magenta];
 "InnerJob4" -> "InnerJob5";
 "InnerJob4" -> "InnerJob6";
 "InnerJob5" -> "InnerJob6";

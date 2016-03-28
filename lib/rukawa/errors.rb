@@ -1,3 +1,3 @@
 module Rukawa
-  class DependentJobFailure < StandardError; end
+  class DependencyUnsatisfied < StandardError; end
 end
