@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'rukawa'
 require 'rukawa/runner'
 require 'rspec-power_assert'
+require 'rspec-parameterized'
 
 RSpec::PowerAssert.example_assertion_alias :assert
 
