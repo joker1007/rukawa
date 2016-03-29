@@ -21,9 +21,11 @@ end
 class Job3 < SampleJob
 end
 class Job4 < SampleJob
+  # inherited by subclass
   set_dependency_type :one_success
 end
 class Job5 < SampleJob
+  # inherited by subclass
   set_retryable limit: 3, wait: 2, type: RuntimeError
 
   def run
@@ -54,6 +56,7 @@ class InnerJob4 < SampleJob
 end
 
 class InnerJob5 < SampleJob
+  # inherited by subclass
   add_skip_rule ->(job) { job.is_a?(SampleJob) }
 end
 
