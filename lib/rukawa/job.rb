@@ -1,26 +1,28 @@
 require 'concurrent'
 require 'rukawa/abstract_job'
+require 'rukawa/dependency'
+require 'rukawa/state'
+require 'active_support/core_ext/class'
 
 module Rukawa
   class Job < AbstractJob
     attr_accessor :in_comings, :out_goings
     attr_reader :state, :started_at, :finished_at
 
+    class_attribute :retryable, :retry_limit, :retry_exception_type, :retry_wait, instance_writer: false
+    class_attribute :dependency_type, instance_writer: false
+    self.dependency_type = Dependency::AllSuccess
+
     class << self
-      attr_reader :retryable, :retry_limit, :retry_exception_type, :retry_wait
       def set_retryable(limit: 8, type: nil, wait: nil)
-        @retryable = true
-        @retry_limit = limit
-        @retry_exception_type = type
-        @retry_wait = wait
+        self.retryable = true
+        self.retry_limit = limit
+        self.retry_exception_type = type
+        self.retry_wait = wait
       end
 
       def set_dependency_type(name)
-        @dependency_type = Rukawa::Dependency.get(name)
-      end
-
-      def dependency_type
-        @dependency_type || Rukawa::Dependency.get(:all_success)
+        self.dependency_type = Rukawa::Dependency.get(name)
       end
     end
 

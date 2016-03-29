@@ -1,17 +1,16 @@
 require 'set'
 require 'rukawa/state'
+require 'active_support/core_ext/class'
 
 module Rukawa
   class AbstractJob
     attr_reader :parent_job_net
 
+    class_attribute :skip_rules, instance_writer: false
+    self.skip_rules = []
     class << self
-      def skip_rules
-        @skip_rules ||= []
-      end
-
       def add_skip_rule(callable_or_symbol)
-        skip_rules.push(callable_or_symbol)
+        self.skip_rules = skip_rules + [callable_or_symbol]
       end
     end
 
@@ -28,10 +27,6 @@ module Rukawa
       parent_skip || skip_rules.inject(false) do |cond, rule|
         cond || rule.is_a?(Symbol) ? method(rule).call : rule.call(self)
       end
-    end
-
-    def skip_rules
-      self.class.skip_rules
     end
 
     def elapsed_time_from(time = Time.now)
