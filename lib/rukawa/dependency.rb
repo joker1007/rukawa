@@ -16,7 +16,7 @@ module Rukawa
 
     class AllSuccess < Base
       def resolve
-        @results.all? { |r| r && r.finished? }
+        @results.all? { |r| r && r.success? }
       end
     end
 
@@ -28,19 +28,19 @@ module Rukawa
 
     class OneSuccess < Base
       def resolve
-        @results.empty? || @results.any? { |r| r && r.finished? }
+        @results.empty? || @results.any? { |r| r && r.success? }
       end
     end
 
     class AllSuccessOrSkipped < Base
       def resolve
-        @results.all? { |r| r && (r.finished? || r.skipped?) }
+        @results.all? { |r| r && (r.success? || r.skipped?) }
       end
     end
 
     class OneSuccessOrSkipped < Base
       def resolve
-        @results.empty? || @results.any? { |r| r && (r.finished? || r.skipped?) }
+        @results.empty? || @results.any? { |r| r && (r.success? || r.skipped?) }
       end
     end
 

@@ -16,6 +16,10 @@ module Rukawa::State
       other
     end
 
+    def success?
+      false
+    end
+
     %i(running? skipped? bypassed? error? aborted? waiting? finished?).each do |sym|
       define_method(sym) do
         false
@@ -64,6 +68,10 @@ module Rukawa::State
 
     def self.color
       :yellow
+    end
+
+    def self.success?
+      true
     end
 
     def self.bypassed?
@@ -136,6 +144,10 @@ module Rukawa::State
 
     def self.color
       :green
+    end
+
+    def self.success?
+      true
     end
 
     def self.finished?
