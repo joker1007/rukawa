@@ -5,6 +5,7 @@ require 'active_support/core_ext/class'
 module Rukawa
   class AbstractJob
     attr_reader :parent_job_net
+    extend ActiveSupport::DescendantsTracker
 
     class_attribute :skip_rules, instance_writer: false
     self.skip_rules = []
