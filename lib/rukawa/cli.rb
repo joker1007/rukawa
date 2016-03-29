@@ -1,5 +1,6 @@
 require 'thor'
 require 'rukawa/runner'
+require 'rukawa/overview'
 
 module Rukawa
   class Cli < Thor
@@ -76,6 +77,16 @@ module Rukawa
       end
 
       exit 1 unless result
+    end
+
+    desc "list", "List JobNet"
+    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
+    method_option :jobs, aliases: "-j", type: :boolean, desc: "Show jobs", default: false
+    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
+    def list
+      load_config
+      load_job_definitions
+      Rukawa::Overview.list_job_net(with_jobs: options[:jobs])
     end
 
     private

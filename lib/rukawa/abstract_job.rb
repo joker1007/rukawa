@@ -5,6 +5,7 @@ require 'active_support/core_ext/class'
 module Rukawa
   class AbstractJob
     attr_reader :parent_job_net
+    extend ActiveSupport::DescendantsTracker
 
     class_attribute :skip_rules, instance_writer: false
     self.skip_rules = []
@@ -12,6 +13,16 @@ module Rukawa
       def add_skip_rule(callable_or_symbol)
         self.skip_rules = skip_rules + [callable_or_symbol]
       end
+
+      def description
+        @description
+      end
+      alias :desc :description
+
+      def set_description(body)
+        @description = body
+      end
+      alias :set_desc :set_description
     end
 
     def name
