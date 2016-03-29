@@ -24,6 +24,7 @@ module Rukawa
   end
 end
 
+require 'active_support'
 require "rukawa/version"
 require 'rukawa/errors'
 require 'rukawa/state'
