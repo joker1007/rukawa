@@ -12,6 +12,7 @@ class SampleJob < Rukawa::Job
 end
 
 class Job1 < SampleJob
+  set_description "Job1 description body"
 end
 class Job2 < SampleJob
   def run

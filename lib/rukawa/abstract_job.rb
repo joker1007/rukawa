@@ -12,6 +12,16 @@ module Rukawa
       def add_skip_rule(callable_or_symbol)
         self.skip_rules = skip_rules + [callable_or_symbol]
       end
+
+      def description
+        @description
+      end
+      alias :desc :description
+
+      def set_description(body)
+        @description = body
+      end
+      alias :set_desc :set_description
     end
 
     def name
