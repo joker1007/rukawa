@@ -7,6 +7,7 @@ describe Rukawa::Dependency do
 
       where(:result1, :result2, :result3, :resolved) do
         Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | true
+        Rukawa::State.get(:finished) | Rukawa::State.get(:bypassed) | Rukawa::State.get(:finished) | true
         Rukawa::State.get(:finished) | Rukawa::State.get(:skipped)  | Rukawa::State.get(:finished) | false
         nil                          | Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | false
       end
@@ -24,6 +25,7 @@ describe Rukawa::Dependency do
 
       where(:result1, :result2, :result3, :resolved) do
         Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | true
+        Rukawa::State.get(:finished) | Rukawa::State.get(:bypassed) | Rukawa::State.get(:finished) | true
         Rukawa::State.get(:finished) | Rukawa::State.get(:skipped)  | Rukawa::State.get(:finished) | true
         nil                          | Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | true
       end
@@ -47,6 +49,7 @@ describe Rukawa::Dependency do
         nil                          | nil                          | Rukawa::State.get(:skipped)  | false
         nil                          | nil                          | nil                          | false
         Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | false
+        nil                          | nil                          | Rukawa::State.get(:bypassed) | true
       end
 
       with_them do
@@ -65,6 +68,7 @@ describe Rukawa::Dependency do
         Rukawa::State.get(:finished) | Rukawa::State.get(:skipped)  | Rukawa::State.get(:finished) | true
         nil                          | Rukawa::State.get(:finished) | Rukawa::State.get(:finished) | false
         Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | true
+        Rukawa::State.get(:bypassed) | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | true
       end
 
       with_them do
@@ -87,6 +91,7 @@ describe Rukawa::Dependency do
         Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | true
         nil                          | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | true
         nil                          | nil                          | Rukawa::State.get(:skipped)  | true
+        nil                          | nil                          | Rukawa::State.get(:bypassed) | true
       end
 
       with_them do
@@ -109,6 +114,7 @@ describe Rukawa::Dependency do
         Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | false
         nil                          | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | false
         nil                          | nil                          | Rukawa::State.get(:skipped)  | false
+        nil                          | nil                          | Rukawa::State.get(:bypassed) | false
       end
 
       with_them do
@@ -131,6 +137,7 @@ describe Rukawa::Dependency do
         Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | false
         nil                          | Rukawa::State.get(:skipped)  | Rukawa::State.get(:skipped)  | true
         nil                          | nil                          | Rukawa::State.get(:skipped)  | true
+        nil                          | nil                          | Rukawa::State.get(:bypassed) | true
       end
 
       with_them do
