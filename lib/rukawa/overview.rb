@@ -15,7 +15,8 @@ module Rukawa
       def list_job
         header = ["Job"]
         table = Terminal::Table.new headings: header do |t|
-          Job.subclasses.each do |job|
+          jobs = ObjectSpace.each_object(Class).find_all{ |klass| klass < Rukawa::Job }
+          jobs.sort{ |a,b| a.to_s <=> b.to_s }.each do |job|
             row = [Paint[job.name, :bold, :underline]]
             t << row
           end
