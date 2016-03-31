@@ -12,6 +12,17 @@ module Rukawa
         puts table
       end
 
+      def list_job
+        header = ["Job"]
+        table = Terminal::Table.new headings: header do |t|
+          Job.subclasses.each do |job|
+            row = [Paint[job.name, :bold, :underline]]
+            t << row
+          end
+        end
+        puts table
+      end
+
       def list_table_row(table, job_net, level = 0, with_jobs: false)
         row = [Paint[job_net.name, :bold, :underline], job_net.desc]
         row << "" if with_jobs
