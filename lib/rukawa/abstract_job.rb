@@ -55,7 +55,7 @@ module Rukawa
       min = elapsed.to_i / 60
       sec = (elapsed - hour * 3600 - min * 60).to_i
 
-      hour_format = min > 0 ? "%dh " % hour : ""
+      hour_format = hour > 0 ? "%dh " % hour : ""
       min_format = min > 0 ? "%dm " % min : ""
       sec_format = "#{sec}s"
       "#{hour_format}#{min_format}#{sec_format}"
