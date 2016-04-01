@@ -11,14 +11,14 @@ module Rukawa
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
-    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :log, aliases: "-l", type: :string, default: nil
     method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name, *job_name)
       load_config
       Rukawa.configure do |c|
-        c.log_file = options[:stdout] ? $stdout : options[:log]
+        c.log_file = options[:stdout] ? $stdout : options[:log] || Rukawa.config.log_file
         c.concurrency = options[:concurrency] if options[:concurrency]
       end
       load_job_definitions
@@ -55,14 +55,14 @@ module Rukawa
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
-    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :log, aliases: "-l", type: :string, default: nil
     method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def run_job(*job_name)
       load_config
       Rukawa.configure do |c|
-        c.log_file = options[:stdout] ? $stdout : options[:log]
+        c.log_file = options[:stdout] ? $stdout : options[:log] || Rukawa.config.log_file
         c.concurrency = options[:concurrency] if options[:concurrency]
       end
       load_job_definitions
