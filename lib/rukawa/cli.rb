@@ -15,6 +15,7 @@ module Rukawa
     method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
     method_option :syslog, type: :boolean, default: false, desc: "Output log to syslog"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
+    method_option :format, aliases: "-f", type: :string, desc: "Output job status format: png, svg, pdf, ... etc"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name, *job_name)
       load_config
@@ -28,7 +29,7 @@ module Rukawa
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
-        job_net.output_dot(options[:dot])
+        job_net.output_dot(options[:dot], format: options[:format])
       end
 
       exit 1 unless result
@@ -38,6 +39,7 @@ module Rukawa
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: []
     method_option :output, aliases: "-o", type: :string, required: true
+    method_option :format, aliases: "-f", type: :string
     def graph(job_net_name, *job_name)
       load_config
       load_job_definitions
@@ -45,7 +47,7 @@ module Rukawa
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
       job_net = job_net_class.new(nil, *job_classes)
-      job_net.output_dot(options[:output])
+      job_net.output_dot(options[:output], format: options[:format])
     end
 
     desc "run_job JOB_NAME [JOB_NAME] ...", "Run specific jobs."
