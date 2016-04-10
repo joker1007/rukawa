@@ -22,8 +22,8 @@ module Rukawa
       set_concurrency
       load_job_definitions
 
-      job_net_class = Object.const_get(job_net_name)
-      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_net_class = get_class(job_net_name)
+      job_classes = job_name.map { |name| get_class(name) }
       job_net = job_net_class.new(nil, *job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
@@ -42,8 +42,8 @@ module Rukawa
       load_config
       load_job_definitions
 
-      job_net_class = Object.const_get(job_net_name)
-      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_net_class = get_class(job_net_name)
+      job_classes = job_name.map { |name| get_class(name) }
       job_net = job_net_class.new(nil, *job_classes)
       job_net.output_dot(options[:output])
     end
@@ -64,7 +64,7 @@ module Rukawa
       set_concurrency
       load_job_definitions
 
-      job_classes = job_name.map { |name| Object.const_get(name) }
+      job_classes = job_name.map { |name| get_class(name) }
       job_net_class = anonymous_job_net_class(*job_classes)
       job_net = job_net_class.new(nil)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
@@ -139,6 +139,13 @@ module Rukawa
       job_dirs.each do |dir|
         Dir.glob(File.join(dir, "**/*.rb")) { |f| load f }
       end
+    end
+
+    def get_class(name)
+      Object.const_get(name)
+    rescue NameError
+      $stderr.puts("`#{name}` class is not found")
+      exit 1
     end
 
     def anonymous_job_net_class(*job_classes)
