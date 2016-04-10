@@ -10,7 +10,8 @@ module Rukawa
 
     def initialize
       @config = OpenStruct.new(
-        concurrency: Concurrent.processor_count
+        concurrency: Concurrent.processor_count,
+        dot_command: "dot"
       )
       @config.graph = GraphConfig.new.tap { |c| c.rankdir = "LR" }
     end

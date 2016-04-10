@@ -58,8 +58,14 @@ module Rukawa
       end
     end
 
-    def output_dot(filename)
-      File.open(filename, 'w') { |f| f.write(to_dot) }
+    def output_dot(filename, format: nil)
+      if format && format != "dot"
+        io = IO.popen(["#{Rukawa.config.dot_command}", "-T#{format}", "-o", filename], "w")
+        io.write(to_dot)
+        io.close
+      else
+        File.open(filename, 'w') { |f| f.write(to_dot) }
+      end
     end
 
     def to_dot(subgraph = false)
