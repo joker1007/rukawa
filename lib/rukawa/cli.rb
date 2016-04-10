@@ -89,6 +89,15 @@ module Rukawa
       Rukawa::Overview.list_job_net(with_jobs: options[:jobs])
     end
 
+    desc "list_job", "List Job"
+    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
+    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
+    def list_job
+      load_config
+      load_job_definitions
+      Rukawa::Overview.list_job
+    end
+
     private
 
     def load_config
