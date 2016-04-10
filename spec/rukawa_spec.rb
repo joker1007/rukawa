@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Rukawa do
   it 'run jobs correctly' do
     Rukawa.configure do |c|
-      c.log_file = STDOUT
+      c.logger = Logger.new($stdout)
     end
     Rukawa::Runner.run(SampleJobNet.new(nil), true)
     expect(ExecuteLog.store).to match({

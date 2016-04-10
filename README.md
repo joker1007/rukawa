@@ -227,6 +227,21 @@ Main usage is manual reentering.
 % dot -Tpng -o SampleJobNet.png SampleJobNet.dot
 ```
 
+### Config Example
+
+```
+# rukawa.rb
+
+Rukawa.configure do |c|
+  c.logger = OtherLogger.new
+  c.concurrency = 4
+  c.graph.concentrate = true
+  c.graph.nodesep = 0.8
+end
+```
+
+see. [Rukawa::Configuration](https://github.com/joker1007/rukawa/blob/master/lib/rukawa/configuration.rb)
+
 ### help
 ```
 % bundle exec rukawa help run

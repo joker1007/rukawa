@@ -6,9 +6,12 @@ require 'concurrent'
 module Rukawa
   class Configuration < Delegator
     include Singleton
+    attr_accessor :logger
 
     def initialize
-      @config = OpenStruct.new(log_file: "./rukawa.log", concurrency: Concurrent.processor_count)
+      @config = OpenStruct.new(
+        concurrency: Concurrent.processor_count
+      )
       @config.graph = GraphConfig.new.tap { |c| c.rankdir = "LR" }
     end
 
