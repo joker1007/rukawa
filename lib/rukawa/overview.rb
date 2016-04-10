@@ -2,10 +2,10 @@ module Rukawa
   module Overview
     class << self
       def list_job_net(with_jobs: false)
-        header = ["Job", "Desc"] 
+        header = ["Job", "Desc"]
         header << "Dependencies" if with_jobs
         table = Terminal::Table.new headings: header do |t|
-          JobNet.subclasses.each do |job_net|
+          JobNet.descendants.each do |job_net|
             list_table_row(t, job_net, job_net.dependencies, with_jobs: with_jobs)
           end
         end
@@ -13,11 +13,10 @@ module Rukawa
       end
 
       def list_job
-        header = ["Job"]
+        header = ["Job", "Desc"]
         table = Terminal::Table.new headings: header do |t|
-          jobs = ObjectSpace.each_object(Class).find_all{ |klass| klass < Rukawa::Job }
-          jobs.sort{ |a,b| a.to_s <=> b.to_s }.each do |job|
-            row = [Paint[job.name, :bold, :underline]]
+          Job.descendants.each do |job|
+            row = [Paint[job.name, :bold, :underline], job.desc]
             t << row
           end
         end
@@ -44,16 +43,16 @@ module Rukawa
         puts table
       end
 
-    def running_table_row(table, job, level = 0)
-      if job.is_a?(JobNet)
-        table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], Paint[job.state.colored, :bold, :underline], Paint[job.formatted_elapsed_time_from, :bold, :underline]]
-        job.each do |inner_j|
-          running_table_row(table, inner_j, level + 1)
+      def running_table_row(table, job, level = 0)
+        if job.is_a?(JobNet)
+          table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], Paint[job.state.colored, :bold, :underline], Paint[job.formatted_elapsed_time_from, :bold, :underline]]
+          job.each do |inner_j|
+            running_table_row(table, inner_j, level + 1)
+          end
+        else
+          table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored, job.formatted_elapsed_time_from]
         end
-      else
-        table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored, job.formatted_elapsed_time_from]
       end
-    end
     end
   end
 end
