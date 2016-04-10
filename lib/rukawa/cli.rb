@@ -11,16 +11,15 @@ module Rukawa
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
     method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
-    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
+    method_option :log, aliases: "-l", type: :string, desc: "Default: ./rukawa.log"
     method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
+    method_option :syslog, type: :boolean, default: false, desc: "Output log to syslog"
     method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def _run(job_net_name, *job_name)
       load_config
-      Rukawa.configure do |c|
-        c.log_file = options[:stdout] ? $stdout : options[:log]
-        c.concurrency = options[:concurrency] if options[:concurrency]
-      end
+      set_logger
+      set_concurrency
       load_job_definitions
 
       job_net_class = Object.const_get(job_net_name)
@@ -61,10 +60,8 @@ module Rukawa
     method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
     def run_job(*job_name)
       load_config
-      Rukawa.configure do |c|
-        c.log_file = options[:stdout] ? $stdout : options[:log]
-        c.concurrency = options[:concurrency] if options[:concurrency]
-      end
+      set_logger
+      set_concurrency
       load_job_definitions
 
       job_classes = job_name.map { |name| Object.const_get(name) }
@@ -105,6 +102,27 @@ module Rukawa
         load File.expand_path(options[:config], Dir.pwd)
       else
         load default_config_file if File.exists?(default_config_file)
+      end
+    end
+
+    def set_logger
+      Rukawa.configure do |c|
+        if options[:stdout]
+          c.logger = Logger.new($stdout)
+        elsif options[:syslog]
+          require 'syslog/logger'
+          c.logger = Syslog::Logger.new('rukawa')
+        elsif options[:log]
+          c.logger = Logger.new(options[:log])
+        else
+          c.logger ||= Logger.new('./rukawa.log');
+        end
+      end
+    end
+
+    def set_concurrency
+      Rukawa.configure do |c|
+        c.concurrency = options[:concurrency] if options[:concurrency]
       end
     end
 

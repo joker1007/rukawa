@@ -3,7 +3,7 @@ require "concurrent"
 module Rukawa
   class << self
     def logger
-      @logger ||= Logger.new(config.log_file)
+      config.logger
     end
 
     def store
