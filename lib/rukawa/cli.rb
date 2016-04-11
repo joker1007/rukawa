@@ -6,6 +6,7 @@ module Rukawa
   class Cli < Thor
     desc "run JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Run jobnet. If JOB_NET is set, resume from JOB_NAME"
     map "run" => "_run"
+    map %w[version -v] => "__print_version"
     method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
     method_option :variables, type: :hash, default: {}
     method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
@@ -95,6 +96,11 @@ module Rukawa
       load_config
       load_job_definitions
       Rukawa::Overview.list_job
+    end
+
+    desc "version(-v)", "Print the version"
+    def __print_version
+      puts "rukawa #{Rukawa::VERSION}"
     end
 
     private
