@@ -62,12 +62,12 @@ module Rukawa
 
     private def do_run(*results)
       @started_at = Time.now
-      check_dependencies(results)
 
       if skip?
         Rukawa.logger.info("Skip #{self.class}")
         set_state(:skipped)
       else
+        check_dependencies(results)
         Rukawa.logger.info("Start #{self.class}")
         set_state(:running)
         run
