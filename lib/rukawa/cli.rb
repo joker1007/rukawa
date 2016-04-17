@@ -4,20 +4,28 @@ require 'rukawa/overview'
 
 module Rukawa
   class Cli < Thor
+
+    def self.base_options
+      method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
+      method_option :job_dirs, type: :array, default: [], desc: "Load job directories", banner: "JOB_DIR1 JOB_DIR2"
+    end
+
+    def self.run_options
+      method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
+      method_option :variables, aliases: "--var", type: :hash, default: {}, banner: "KEY:VALUE KEY:VALUE"
+      method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
+      method_option :log, aliases: "-l", type: :string, desc: "Default: ./rukawa.log"
+      method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
+      method_option :syslog, type: :boolean, default: false, desc: "Output log to syslog"
+      method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
+      method_option :format, aliases: "-f", type: :string, desc: "Output job status format: png, svg, pdf, ... etc"
+      method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
+    end
+
     desc "run JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Run jobnet. If JOB_NET is set, resume from JOB_NAME"
     map "run" => "_run"
-    map %w[version -v] => "__print_version"
-    method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
-    method_option :variables, type: :hash, default: {}
-    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
-    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
-    method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
-    method_option :log, aliases: "-l", type: :string, desc: "Default: ./rukawa.log"
-    method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
-    method_option :syslog, type: :boolean, default: false, desc: "Output log to syslog"
-    method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
-    method_option :format, aliases: "-f", type: :string, desc: "Output job status format: png, svg, pdf, ... etc"
-    method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
+    base_options
+    run_options
     def _run(job_net_name, *job_name)
       load_config
       set_logger
@@ -37,8 +45,7 @@ module Rukawa
     end
 
     desc "graph JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Output jobnet graph. If JOB_NET is set, simulate resumed job sequence"
-    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
-    method_option :job_dirs, type: :array, default: []
+    base_options
     method_option :output, aliases: "-o", type: :string, required: true
     method_option :format, aliases: "-f", type: :string
     def graph(job_net_name, *job_name)
@@ -52,15 +59,8 @@ module Rukawa
     end
 
     desc "run_job JOB_NAME [JOB_NAME] ...", "Run specific jobs."
-    method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
-    method_option :variables, type: :hash, default: {}
-    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
-    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
-    method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
-    method_option :log, aliases: "-l", type: :string, default: "./rukawa.log"
-    method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
-    method_option :dot, aliases: "-d", type: :string, default: nil, desc: "Output job status by dot format"
-    method_option :refresh_interval, aliases: "-r", type: :numeric, default: 3, desc: "Refresh interval for running status information"
+    base_options
+    run_options
     def run_job(*job_name)
       load_config
       set_logger
@@ -80,9 +80,8 @@ module Rukawa
     end
 
     desc "list", "List JobNet"
-    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
+    base_options
     method_option :jobs, aliases: "-j", type: :boolean, desc: "Show jobs", default: false
-    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
     def list
       load_config
       load_job_definitions
@@ -90,14 +89,14 @@ module Rukawa
     end
 
     desc "list_job", "List Job"
-    method_option :config, type: :string, default: nil, desc: "If this options is not set, try to load ./rukawa.rb"
-    method_option :job_dirs, type: :array, default: [], desc: "Load job directories"
+    base_options
     def list_job
       load_config
       load_job_definitions
       Rukawa::Overview.list_job
     end
 
+    map %w[version -v] => "__print_version"
     desc "version(-v)", "Print the version"
     def __print_version
       puts "rukawa #{Rukawa::VERSION}"
