@@ -262,6 +262,23 @@ var2: value2
 }
 ```
 
+### Semaphore
+
+You can control concurrency consumption.
+
+```ruby
+class Job < Rukawa::Job
+  set_resource_count 2
+
+  def run
+    # process
+  end
+end
+```
+
+This job use 2 concurrency. (this does not means that job use 2 threads)
+If concurrency is less than jobs's resource count, resource count is set concurrency size.
+
 ### Config Example
 
 ```
