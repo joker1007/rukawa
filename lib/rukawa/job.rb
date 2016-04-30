@@ -7,7 +7,7 @@ require 'active_support/core_ext/class'
 module Rukawa
   class Job < AbstractJob
     attr_accessor :in_comings, :out_goings
-    attr_reader :state, :started_at, :finished_at
+    attr_reader :state, :started_at, :finished_at, :variables
 
     class_attribute :retryable, :retry_limit, :retry_exception_type, :retry_wait, instance_writer: false
     class_attribute :dependency_type, instance_writer: false
@@ -26,8 +26,9 @@ module Rukawa
       end
     end
 
-    def initialize(parent_job_net)
+    def initialize(parent_job_net, variables)
       @parent_job_net = parent_job_net
+      @variables = variables
       @in_comings = Set.new
       @out_goings = Set.new
       @retry_count = 0

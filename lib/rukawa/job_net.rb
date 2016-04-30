@@ -11,10 +11,10 @@ module Rukawa
       end
     end
 
-    def initialize(parent_job_net, *resume_job_classes)
+    def initialize(parent_job_net, variables, *resume_job_classes)
       @parent_job_net = parent_job_net
       @dag = Dag.new
-      @dag.build(self, self.class.dependencies)
+      @dag.build(self, variables, self.class.dependencies)
       @resume_job_classes = resume_job_classes
 
       unless resume_job_classes.empty?

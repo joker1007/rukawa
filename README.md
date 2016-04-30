@@ -227,6 +227,41 @@ Main usage is manual reentering.
 % dot -Tpng -o SampleJobNet.png SampleJobNet.dot
 ```
 
+### Use variables
+
+```ruby
+class Job < Rukawa::Job
+  def run
+    # access via `variables` method
+    # return freezed Hash object
+    puts variables["var1"]
+    puts variables["var2"]
+  end
+end
+```
+
+```sh
+% bundle exec rukawa run SampleJobNet --var var1:value1 var2:value2
+# or
+% bundle exec rukawa run SampleJobNet --varfile variables.yml
+# or
+% bundle exec rukawa run SampleJobNet --varfile variables.json
+```
+
+```yml
+# variables.yml
+var1: value1
+var2: value2
+```
+
+```javascript
+// variables.json
+{
+  "var1": "value1",
+  "var2": "value2"
+}
+```
+
 ### Config Example
 
 ```
@@ -249,17 +284,19 @@ Usage:
   rukawa run JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...
 
 Options:
-  -c, [--concurrency=N]           # Default: cpu count
-      [--variables=key:value]
-      [--config=CONFIG]           # If this options is not set, try to load ./rukawa.rb
-      [--job-dirs=one two three]  # Load job directories
-  -b, [--batch], [--no-batch]     # If batch mode, not display running status
-  -l, [--log=LOG]
-                                  # Default: ./rukawa.log
-      [--stdout], [--no-stdout]   # Output log to stdout
-  -d, [--dot=DOT]                 # Output job status by dot format
-  -r, [--refresh-interval=N]      # Refresh interval for running status information
-                                  # Default: 3
+      [--config=CONFIG]                     # If this options is not set, try to load ./rukawa.rb
+      [--job-dirs=JOB_DIR1 JOB_DIR2]        # Load job directories
+  -c, [--concurrency=N]                     # Default: cpu count
+  --var, [--variables=KEY:VALUE KEY:VALUE]
+      [--varfile=VARFILE]                   # variable definition file. ex (variables.yml, variables.json)
+  -b, [--batch], [--no-batch]               # If batch mode, not display running status
+  -l, [--log=LOG]                           # Default: ./rukawa.log
+      [--stdout], [--no-stdout]             # Output log to stdout
+      [--syslog], [--no-syslog]             # Output log to syslog
+  -d, [--dot=DOT]                           # Output job status by dot format
+  -f, [--format=FORMAT]                     # Output job status format: png, svg, pdf, ... etc
+  -r, [--refresh-interval=N]                # Refresh interval for running status information
+                                            # Default: 3
 
 Run jobnet. If JOB_NET is set, resume from JOB_NAME
 
@@ -269,17 +306,19 @@ Usage:
   rukawa run_job JOB_NAME [JOB_NAME] ...
 
 Options:
-  -c, [--concurrency=N]           # Default: cpu count
-      [--variables=key:value]
-      [--config=CONFIG]           # If this options is not set, try to load ./rukawa.rb
-      [--job-dirs=one two three]  # Load job directories
-  -b, [--batch], [--no-batch]     # If batch mode, not display running status
-  -l, [--log=LOG]
-                                  # Default: ./rukawa.log
-      [--stdout], [--no-stdout]   # Output log to stdout
-  -d, [--dot=DOT]                 # Output job status by dot format
-  -r, [--refresh-interval=N]      # Refresh interval for running status information
-                                  # Default: 3
+      [--config=CONFIG]                     # If this options is not set, try to load ./rukawa.rb
+      [--job-dirs=JOB_DIR1 JOB_DIR2]        # Load job directories
+  -c, [--concurrency=N]                     # Default: cpu count
+  --var, [--variables=KEY:VALUE KEY:VALUE]
+      [--varfile=VARFILE]                   # variable definition file. ex (variables.yml, variables.json)
+  -b, [--batch], [--no-batch]               # If batch mode, not display running status
+  -l, [--log=LOG]                           # Default: ./rukawa.log
+      [--stdout], [--no-stdout]             # Output log to stdout
+      [--syslog], [--no-syslog]             # Output log to syslog
+  -d, [--dot=DOT]                           # Output job status by dot format
+  -f, [--format=FORMAT]                     # Output job status format: png, svg, pdf, ... etc
+  -r, [--refresh-interval=N]                # Refresh interval for running status information
+                                            # Default: 3
 
 Run specific jobs.
 
