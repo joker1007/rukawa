@@ -279,6 +279,35 @@ end
 This job use 2 concurrency. (this does not means that job use 2 threads)
 If concurrency is less than jobs's resource count, resource count is set concurrency size.
 
+### Callback
+
+```ruby
+class Job < Rukawa::Job
+  before_run :wait_other_resource
+  after_run :notify_finish
+  around_run do |job, blk|
+    begin
+      setup_resource
+      blk.call
+    ensure
+      release_resource
+    end
+  end
+
+  def run
+    # process
+  end
+
+  def wait_other_resource
+    sleep(3)
+  end
+
+  def notify_finish
+    send_notification_to_slack
+  end
+end
+```
+
 ### Config Example
 
 ```
