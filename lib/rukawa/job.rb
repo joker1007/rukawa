@@ -11,7 +11,9 @@ module Rukawa
 
     class_attribute :retryable, :retry_limit, :retry_exception_type, :retry_wait, instance_writer: false
     class_attribute :dependency_type, instance_writer: false
+    class_attribute :resource_count, instance_reader: false, instance_writer: false
     self.dependency_type = Dependency::AllSuccess
+    self.resource_count = 1
 
     class << self
       def set_retryable(limit: 8, type: nil, wait: nil)
@@ -23,6 +25,10 @@ module Rukawa
 
       def set_dependency_type(name)
         self.dependency_type = Rukawa::Dependency.get(name)
+      end
+
+      def set_resource_count(count)
+        self.resource_count = count
       end
     end
 
@@ -69,11 +75,16 @@ module Rukawa
         set_state(:skipped)
       else
         check_dependencies(results)
-        Rukawa.logger.info("Start #{self.class}")
-        set_state(:running)
-        run
-        Rukawa.logger.info("Finish #{self.class}")
-        set_state(:finished)
+        begin
+          Rukawa.semaphore.acquire(resource_count)
+          Rukawa.logger.info("Start #{self.class}")
+          set_state(:running)
+          run
+          Rukawa.logger.info("Finish #{self.class}")
+          set_state(:finished)
+        ensure
+          Rukawa.semaphore.release(resource_count)
+        end
       end
     rescue => e
       handle_error(e)
@@ -152,6 +163,10 @@ module Rukawa
     def store(key, value)
       Rukawa.store[self.class] ||= Concurrent::Hash.new
       Rukawa.store[self.class][key] = value
+    end
+
+    def resource_count
+      [self.class.resource_count, Rukawa.config.concurrency].min
     end
   end
 end

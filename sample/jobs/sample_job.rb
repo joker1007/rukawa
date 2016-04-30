@@ -29,6 +29,7 @@ end
 class Job4 < SampleJob
   # inherited by subclass
   set_dependency_type :one_success
+  set_resource_count 3
 end
 class Job5 < SampleJob
   # inherited by subclass
