@@ -3,9 +3,17 @@ require 'rukawa/abstract_job'
 require 'rukawa/dependency'
 require 'rukawa/state'
 require 'active_support/core_ext/class'
+require 'active_support/callbacks'
 
 module Rukawa
   class Job < AbstractJob
+    include ActiveSupport::Callbacks
+    define_callbacks :run,
+      terminator: ->(_,result) { result == false },
+      skip_after_callbacks_if_terminated: true,
+      scope: [:kind, :name],
+      only: [:before, :around, :after]
+
     attr_accessor :in_comings, :out_goings
     attr_reader :state, :started_at, :finished_at, :variables
 
@@ -30,6 +38,37 @@ module Rukawa
       def set_resource_count(count)
         self.resource_count = count
       end
+
+      def before_run(*args, **options, &block)
+        set_callback :run, :before, *args, **options, &block
+      end
+
+      def after_run(*args, **options, &block)
+        options[:prepend] = true
+        conditional = ActiveSupport::Callbacks::Conditionals::Value.new { |v|
+          v != false
+        }
+        options[:if] = Array(options[:if]) << conditional
+        set_callback :run, :after, *args, **options, &block
+      end
+
+      def around_run(*args, **options, &block)
+        set_callback :run, :around, *args, **options, &block
+      end
+    end
+
+    around_run :acquire_resource
+
+    around_run do |_, blk|
+      Rukawa.logger.info("Start #{self.class}")
+      blk.call
+      Rukawa.logger.info("Finish #{self.class}")
+    end
+
+    around_run do |_, blk|
+      set_state(:running)
+      blk.call
+      set_state(:finished)
     end
 
     def initialize(parent_job_net, variables)
@@ -75,15 +114,8 @@ module Rukawa
         set_state(:skipped)
       else
         check_dependencies(results)
-        begin
-          Rukawa.semaphore.acquire(resource_count)
-          Rukawa.logger.info("Start #{self.class}")
-          set_state(:running)
+        run_callbacks :run do
           run
-          Rukawa.logger.info("Finish #{self.class}")
-          set_state(:finished)
-        ensure
-          Rukawa.semaphore.release(resource_count)
         end
       end
     rescue => e
@@ -167,6 +199,13 @@ module Rukawa
 
     def resource_count
       [self.class.resource_count, Rukawa.config.concurrency].min
+    end
+
+    def acquire_resource
+      Rukawa.semaphore.acquire(resource_count)
+      yield
+    ensure
+      Rukawa.semaphore.release(resource_count)
     end
   end
 end
