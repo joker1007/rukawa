@@ -16,6 +16,7 @@ module Rukawa
     end
 
     def run(batch_mode = false, refresh_interval = DEFAULT_REFRESH_INTERVAL)
+      Rukawa.init
       Rukawa.logger.info("=== Start Rukawa ===")
       futures = @root_job_net.dataflows.each(&:execute)
       until futures.all?(&:complete?)

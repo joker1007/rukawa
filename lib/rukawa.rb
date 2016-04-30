@@ -2,12 +2,18 @@ require "concurrent"
 
 module Rukawa
   class << self
+    def init
+      unless @initialized
+        @store = Concurrent::Hash.new
+        @executor = Concurrent::FixedThreadPool.new(config.concurrency)
+        @semaphore = Concurrent::Semaphore.new(config.concurrency)
+        @initialized = true
+      end
+    end
+    attr_reader :store, :executor, :semaphore
+
     def logger
       config.logger
-    end
-
-    def store
-      @store ||= Concurrent::Hash.new
     end
 
     def configure
@@ -16,10 +22,6 @@ module Rukawa
 
     def config
       Configuration.instance
-    end
-
-    def executor
-      @executor ||= Concurrent::FixedThreadPool.new(config.concurrency)
     end
   end
 end
