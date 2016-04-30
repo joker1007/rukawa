@@ -9,6 +9,10 @@ class SampleJob < Rukawa::Job
     sleep rand(5)
     ExecuteLog.store[self.class] = Time.now
   end
+
+  def ext_method
+    puts "ext target"
+  end
 end
 
 class Job1 < SampleJob
@@ -16,6 +20,7 @@ class Job1 < SampleJob
 
   def run
     p variables unless variables.empty?
+    ext_method
     super
   end
 end

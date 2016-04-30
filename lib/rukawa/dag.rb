@@ -19,6 +19,9 @@ module Rukawa
 
       deps.each do |job_class|
         job = job_class.new(job_net, variables)
+        Rukawa.config.extensions.each do |ext|
+          job.singleton_class.prepend(ext)
+        end
         @nodes << job
         @jobs << job if job.is_a?(Job)
 
