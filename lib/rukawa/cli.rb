@@ -13,6 +13,7 @@ module Rukawa
     def self.run_options
       method_option :concurrency, aliases: "-c", type: :numeric, default: nil, desc: "Default: cpu count"
       method_option :variables, aliases: "--var", type: :hash, default: {}, banner: "KEY:VALUE KEY:VALUE"
+      method_option :varfile, type: :string, default: nil, desc: "variable definition file. ex (variables.yml, variables.json)"
       method_option :batch, aliases: "-b", type: :boolean, default: false, desc: "If batch mode, not display running status"
       method_option :log, aliases: "-l", type: :string, desc: "Default: ./rukawa.log"
       method_option :stdout, type: :boolean, default: false, desc: "Output log to stdout"
@@ -34,7 +35,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, *job_classes)
+      job_net = job_net_class.new(nil, variables, *job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
@@ -54,7 +55,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, *job_classes)
+      job_net = job_net_class.new(nil, {}, *job_classes)
       job_net.output_dot(options[:output], format: options[:format])
     end
 
@@ -69,7 +70,7 @@ module Rukawa
 
       job_classes = job_name.map { |name| get_class(name) }
       job_net_class = anonymous_job_net_class(*job_classes)
-      job_net = job_net_class.new(nil)
+      job_net = job_net_class.new(nil, variables)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
@@ -163,6 +164,29 @@ module Rukawa
 
         define_method(:name) { "AnonymousJobNet" }
       end
+    end
+
+    def variables
+      if options[:varfile]
+        read_varfile.freeze
+      else
+        options[:variables].freeze
+      end
+    end
+
+    def read_varfile
+      raise "varfile is not found" unless File.exist?(options[:varfile])
+
+      extname = File.extname(options[:varfile])
+      if %w(.yml .yaml).include?(extname)
+        require 'yaml'
+        deserializer = ->(data) { YAML.load(data) }
+      elsif %w(.js .json).include?(extname)
+        require 'json'
+        deserializer = ->(data) { JSON.load(data) }
+      end
+
+      deserializer.call(File.read(options[:varfile]))
     end
   end
 end

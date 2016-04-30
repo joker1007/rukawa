@@ -13,6 +13,11 @@ end
 
 class Job1 < SampleJob
   set_description "Job1 description body"
+
+  def run
+    p variables unless variables.empty?
+    super
+  end
 end
 class Job2 < SampleJob
   def run
