@@ -175,7 +175,10 @@ module Rukawa
     end
 
     def read_varfile
-      raise "varfile is not found" unless File.exist?(options[:varfile])
+      unless File.exist?(options[:varfile])
+        $stderr.puts("`#{options[:varfile]}` is not found")
+        exit 1
+      end
 
       extname = File.extname(options[:varfile])
       if %w(.yml .yaml).include?(extname)
