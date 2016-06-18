@@ -27,6 +27,10 @@ class Job1 < SampleJob
   end
 end
 class Job2 < SampleJob
+  after_fail do |job|
+    p "Job2 Failed!!! #{job.state.name}"
+  end
+
   def run
     raise "job2 error"
   end

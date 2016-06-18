@@ -281,6 +281,11 @@ If concurrency is less than jobs's resource count, resource count is set concurr
 
 ### Callback
 
+- before\_run
+- after\_run
+- around\_run
+- after\_fail
+
 ```ruby
 class Job < Rukawa::Job
   before_run :wait_other_resource

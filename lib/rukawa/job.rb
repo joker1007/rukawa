@@ -14,6 +14,12 @@ module Rukawa
       scope: [:kind, :name],
       only: [:before, :around, :after]
 
+    define_callbacks :fail,
+      terminator: ->(_,result) { result == false },
+      skip_after_callbacks_if_terminated: true,
+      scope: [:kind, :name],
+      only: [:after]
+
     attr_accessor :in_comings, :out_goings
     attr_reader :state, :started_at, :finished_at, :variables
 
@@ -50,6 +56,15 @@ module Rukawa
         }
         options[:if] = Array(options[:if]) << conditional
         set_callback :run, :after, *args, **options, &block
+      end
+
+      def after_fail(*args, **options, &block)
+        options[:prepend] = true
+        conditional = ActiveSupport::Callbacks::Conditionals::Value.new { |v|
+          v != false
+        }
+        options[:if] = Array(options[:if]) << conditional
+        set_callback :fail, :after, *args, **options, &block
       end
 
       def around_run(*args, **options, &block)
@@ -119,6 +134,7 @@ module Rukawa
         end
       end
     rescue => e
+      run_callbacks :fail
       handle_error(e)
       Rukawa.logger.error("Retry #{self.class}")
       retry
