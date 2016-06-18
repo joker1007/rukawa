@@ -4,6 +4,12 @@ module ExecuteLog
   end
 end
 
+class Notifier
+  def after_run(job)
+    puts "#{job.name}:#{job.state.name}:#{job.elapsed_time_from}"
+  end
+end
+
 class SampleJob < Rukawa::Job
   def run
     sleep rand(5)
@@ -13,6 +19,7 @@ end
 
 class Job1 < SampleJob
   set_description "Job1 description body"
+  after_run Notifier.new
 
   def run
     p variables unless variables.empty?
