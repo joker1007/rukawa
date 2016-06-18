@@ -23,6 +23,13 @@ module Rukawa
     def config
       Configuration.instance
     end
+
+    def load_jobs
+      job_dirs = config.job_dirs.map { |d| File.expand_path(d) }.uniq
+      job_dirs.each do |dir|
+        Dir.glob(File.join(dir, "**/*.rb")) { |f| load f }
+      end
+    end
   end
 end
 

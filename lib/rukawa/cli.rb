@@ -111,6 +111,10 @@ module Rukawa
       else
         load default_config_file if File.exists?(default_config_file)
       end
+
+      Rukawa.configure do |c|
+        c.job_dirs.concat(options[:job_dirs]) unless options[:job_dirs].empty?
+      end
     end
 
     def set_logger
@@ -138,15 +142,8 @@ module Rukawa
       "./rukawa.rb"
     end
 
-    def default_job_dirs
-      [File.join(Dir.pwd, "job_nets"), File.join(Dir.pwd, "jobs")]
-    end
-
     def load_job_definitions
-      job_dirs = (default_job_dirs + options[:job_dirs]).map { |d| File.expand_path(d) }.uniq
-      job_dirs.each do |dir|
-        Dir.glob(File.join(dir, "**/*.rb")) { |f| load f }
-      end
+      Rukawa.load_jobs
     end
 
     def get_class(name)
