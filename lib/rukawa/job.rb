@@ -163,7 +163,7 @@ module Rukawa
     end
 
     def bypass_dataflow
-      Concurrent.dataflow_with(@context.executor, *depend_dataflows) do |*results|
+      Concurrent.dataflow_with(@context.executor, *depend_dataflows) do
         Rukawa.logger.info("Skip #{self.class}")
         @state
       end
