@@ -385,9 +385,25 @@ Options:
 Output jobnet graph. If JOB_NET is set, simulate resumed job sequence
 ```
 
+### Usage from Ruby program
+
+```ruby
+currency = 4
+job_net = YourJobNetClass.new(nil, {"var1" => "value1"}, Context.new(currency))
+promise = job_net.run do
+  puts "Job Running"
+end
+
+promise.then do |futures|
+  errors = futures.map(&:reason).compact
+  unless errors.empty?
+    puts "JobNet has errors"
+  end
+end
+```
+
 ## ToDo
 - Write more tests
-- Enable use variables
 
 ## Development
 
