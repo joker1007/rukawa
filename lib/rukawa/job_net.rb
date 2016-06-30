@@ -3,7 +3,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class JobNet < AbstractJob
     include Enumerable
-    attr_reader :dag, :context
+    attr_reader :dag, :context, :variables
 
     class << self
       def dependencies
@@ -13,6 +13,7 @@ module Rukawa
 
     def initialize(parent_job_net, variables, context, *resume_job_classes)
       @parent_job_net = parent_job_net
+      @variables = variables
       @context = context
       @dag = Dag.new
       @dag.build(self, variables, context, self.class.dependencies)
