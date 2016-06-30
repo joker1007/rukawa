@@ -86,9 +86,10 @@ module Rukawa
       set_state(:finished)
     end
 
-    def initialize(parent_job_net, variables)
+    def initialize(parent_job_net, variables, context)
       @parent_job_net = parent_job_net
       @variables = variables
+      @context = context
       @in_comings = Set.new
       @out_goings = Set.new
       @retry_count = 0
@@ -112,7 +113,7 @@ module Rukawa
       return @dataflow if @dataflow
       return @dataflow = bypass_dataflow if @state.bypassed?
 
-      @dataflow = Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
+      @dataflow = Concurrent.dataflow_with(@context.executor, *depend_dataflows) do |*results|
         do_run(*results)
         @state
       end
@@ -162,7 +163,7 @@ module Rukawa
     end
 
     def bypass_dataflow
-      Concurrent.dataflow_with(Rukawa.executor, *depend_dataflows) do |*results|
+      Concurrent.dataflow_with(@context.executor, *depend_dataflows) do |*results|
         Rukawa.logger.info("Skip #{self.class}")
         @state
       end
@@ -209,8 +210,8 @@ module Rukawa
     end
 
     def store(key, value)
-      Rukawa.store[self.class] ||= Concurrent::Hash.new
-      Rukawa.store[self.class][key] = value
+      @context.store[self.class] ||= Concurrent::Hash.new
+      @context.store[self.class][key] = value
     end
 
     def resource_count
@@ -218,10 +219,10 @@ module Rukawa
     end
 
     def acquire_resource
-      Rukawa.semaphore.acquire(resource_count)
+      @context.semaphore.acquire(resource_count)
       yield
     ensure
-      Rukawa.semaphore.release(resource_count)
+      @context.semaphore.release(resource_count)
     end
   end
 end

@@ -5,7 +5,7 @@ describe Rukawa do
     Rukawa.configure do |c|
       c.logger = Logger.new($stdout)
     end
-    Rukawa::Runner.run(SampleJobNet.new(nil, {"var1" => "value1"}), true)
+    Rukawa::Runner.run(SampleJobNet.new(nil, {"var1" => "value1"}, Rukawa::Context.new), true)
     expect(ExecuteLog.store).to match({
       Job1 => an_instance_of(Time),
       Job3 => an_instance_of(Time),
@@ -33,7 +33,7 @@ describe Rukawa do
   end
 
   it 'constructs dag correctly' do
-    job_net = SampleJobNet.new(nil, {})
+    job_net = SampleJobNet.new(nil, {}, Rukawa::Context.new)
     job_classes = Set.new
     collect_jobs = ->(j, set) {
       j.dependencies.each_key do |n|
@@ -68,7 +68,7 @@ describe Rukawa do
     subclass = Class.new(InnerJobNet4) do
       add_skip_rule ->(job_net) { true }
     end
-    job_net = subclass.new(nil, {})
+    job_net = subclass.new(nil, {}, Rukawa::Context.new)
 
     expect(job_net).to be_skip
     expect(job_net.dag.jobs).to all(be_skip)

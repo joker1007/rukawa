@@ -12,33 +12,28 @@ module Rukawa
 
     def initialize(root_job_net)
       @root_job_net = root_job_net
-      @errors = []
     end
 
     def run(batch_mode = false, refresh_interval = DEFAULT_REFRESH_INTERVAL)
-      Rukawa.init
-      Rukawa.logger.info("=== Start Rukawa ===")
-      futures = @root_job_net.dataflows.each(&:execute)
-      until futures.all?(&:complete?)
-        Overview.display_running_status(@root_job_net) unless batch_mode
-        sleep refresh_interval
+      displayed_at = Time.at(0)
+      promise = @root_job_net.run do
+        unless batch_mode
+          if Time.now - displayed_at >= refresh_interval
+            displayed_at = Time.now
+            Overview.display_running_status(@root_job_net)
+          end
+        end
       end
-      Rukawa.logger.info("=== Finish Rukawa ===")
+      futures = promise.value
 
       Overview.display_running_status(@root_job_net) unless batch_mode
       puts "Finished #{@root_job_net.name} in #{@root_job_net.formatted_elapsed_time_from}"
 
-      errors = futures.map(&:reason).compact
-
-      unless errors.empty?
-        errors.each do |err|
-          next if err.is_a?(DependencyUnsatisfied)
-          Rukawa.logger.error(err)
-        end
-        return false
+      if futures.all?(&:fulfilled?)
+        true
+      else
+        false
       end
-
-      true
     end
   end
 end
