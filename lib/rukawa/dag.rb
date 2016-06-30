@@ -14,11 +14,11 @@ module Rukawa
       @edges = Set.new
     end
 
-    def build(job_net, variables, dependencies)
+    def build(job_net, variables, context, dependencies)
       deps = tsortable_hash(dependencies).tsort
 
       deps.each do |job_class|
-        job = job_class.new(job_net, variables)
+        job = job_class.new(job_net, variables, context)
         @nodes << job
         @jobs << job if job.is_a?(Job)
 

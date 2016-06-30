@@ -6,7 +6,7 @@ module Rukawa
         header << "Dependencies" if with_jobs
         table = Terminal::Table.new headings: header do |t|
           JobNet.descendants.each do |job_net|
-            list_table_row(t, job_net, job_net.dependencies, with_jobs: with_jobs)
+            list_table_row(t, job_net, with_jobs: with_jobs)
           end
         end
         puts table
@@ -23,7 +23,7 @@ module Rukawa
         puts table
       end
 
-      def list_table_row(table, job_net, level = 0, with_jobs: false)
+      def list_table_row(table, job_net, with_jobs: false)
         row = [Paint[job_net.name, :bold, :underline], job_net.desc]
         row << "" if with_jobs
         table << row

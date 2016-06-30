@@ -35,14 +35,19 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, variables, *job_classes)
+      job_net = job_net_class.new(nil, variables, Context.new, *job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
         job_net.output_dot(options[:dot], format: options[:format])
       end
 
-      exit 1 unless result
+      unless result
+        puts "\nIf you want to retry, run following command."
+        failed_jobs = job_net.dag.jobs.each_with_object([]) { |j, arr| arr << j.class.to_s if j.state == Rukawa::State::Error }
+        puts "  rukawa run #{job_net_name} #{failed_jobs.join(" ")}"
+        exit 1
+      end
     end
 
     desc "graph JOB_NET_NAME [JOB_NAME] [JOB_NAME] ...", "Output jobnet graph. If JOB_NET is set, simulate resumed job sequence"
@@ -55,7 +60,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, {}, *job_classes)
+      job_net = job_net_class.new(nil, {}, Context.new, *job_classes)
       job_net.output_dot(options[:output], format: options[:format])
     end
 
@@ -70,7 +75,7 @@ module Rukawa
 
       job_classes = job_name.map { |name| get_class(name) }
       job_net_class = anonymous_job_net_class(*job_classes)
-      job_net = job_net_class.new(nil, variables)
+      job_net = job_net_class.new(nil, variables, Context.new)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]

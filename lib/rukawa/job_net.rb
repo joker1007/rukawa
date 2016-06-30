@@ -3,7 +3,7 @@ require 'rukawa/abstract_job'
 module Rukawa
   class JobNet < AbstractJob
     include Enumerable
-    attr_reader :dag
+    attr_reader :dag, :context
 
     class << self
       def dependencies
@@ -11,10 +11,11 @@ module Rukawa
       end
     end
 
-    def initialize(parent_job_net, variables, *resume_job_classes)
+    def initialize(parent_job_net, variables, context, *resume_job_classes)
       @parent_job_net = parent_job_net
+      @context = context
       @dag = Dag.new
-      @dag.build(self, variables, self.class.dependencies)
+      @dag.build(self, variables, context, self.class.dependencies)
       @resume_job_classes = resume_job_classes
 
       unless resume_job_classes.empty?
@@ -30,6 +31,31 @@ module Rukawa
           end
         end
       end
+    end
+
+    def execute
+      dataflows.each(&:execute)
+    end
+
+    def run(wait_interval = 1)
+      promise = Concurrent::Promise.new do
+        futures = execute
+        until futures.all?(&:complete?)
+          yield self if block_given?
+          sleep wait_interval
+        end
+        errors = futures.map(&:reason).compact
+
+        unless errors.empty?
+          errors.each do |err|
+            next if err.is_a?(DependencyUnsatisfied)
+            Rukawa.logger.error(err)
+          end
+        end
+
+        futures
+      end
+      promise.execute
     end
 
     def started_at
