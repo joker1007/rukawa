@@ -35,7 +35,13 @@ module Rukawa
       end
 
       def display_running_status(root_job_net)
-        table = Terminal::Table.new headings: ["Job", "Status", "Elapsed Time"] do |t|
+        context = root_job_net.context
+        table = Terminal::Table.new(headings: [
+          "Job",
+          "Status",
+          "Elapsed Time",
+          "Resource Count (#{context.semaphore.available_permits}/#{context.concurrency})",
+        ]) do |t|
           root_job_net.each_with_index do |j|
             running_table_row(t, j)
           end
@@ -45,12 +51,17 @@ module Rukawa
 
       def running_table_row(table, job, level = 0)
         if job.is_a?(JobNet)
-          table << [Paint["#{"  " * level}#{job.class}", :bold, :underline], Paint[job.state.colored, :bold, :underline], Paint[job.formatted_elapsed_time_from, :bold, :underline]]
+          table << [
+            Paint["#{"  " * level}#{job.class}", :bold, :underline],
+            Paint[job.state.colored, :bold, :underline],
+            Paint[job.formatted_elapsed_time_from, :bold, :underline],
+            "",
+          ]
           job.each do |inner_j|
             running_table_row(table, inner_j, level + 1)
           end
         else
-          table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored, job.formatted_elapsed_time_from]
+          table << [Paint["#{"  " * level}#{job.class}", :bold], job.state.colored, job.formatted_elapsed_time_from, job.resource_count]
         end
       end
     end

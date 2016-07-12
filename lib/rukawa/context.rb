@@ -1,12 +1,13 @@
 module Rukawa
   class Context
-    attr_reader :store, :executor, :semaphore
+    attr_reader :store, :executor, :semaphore, :concurrency
 
-    def initialize(currency = nil)
+    def initialize(concurrency = nil)
+      @concurrency = concurrency || Rukawa.config.concurrency
       @store = Concurrent::Hash.new
-      @executor = Concurrent::FixedThreadPool.new(currency || Rukawa.config.concurrency)
+      @executor = Concurrent::FixedThreadPool.new(@concurrency)
       @executor.auto_terminate = true
-      @semaphore = Concurrent::Semaphore.new(currency || Rukawa.config.concurrency)
+      @semaphore = Concurrent::Semaphore.new(@concurrency)
     end
 
     def shutdown

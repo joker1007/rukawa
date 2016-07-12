@@ -156,6 +156,10 @@ module Rukawa
       end
     end
 
+    def resource_count
+      [self.class.resource_count, Rukawa.config.concurrency].min
+    end
+
     private
 
     def depend_dataflows
@@ -212,10 +216,6 @@ module Rukawa
     def store(key, value)
       @context.store[self.class] ||= Concurrent::Hash.new
       @context.store[self.class][key] = value
-    end
-
-    def resource_count
-      [self.class.resource_count, Rukawa.config.concurrency].min
     end
 
     def acquire_resource
