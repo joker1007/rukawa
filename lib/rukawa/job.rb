@@ -219,10 +219,10 @@ module Rukawa
     end
 
     def acquire_resource
-      @context.semaphore.acquire(resource_count)
+      @context.semaphore.acquire(resource_count) if resource_count > 0
       yield
     ensure
-      @context.semaphore.release(resource_count)
+      @context.semaphore.release(resource_count) if resource_count > 0
     end
   end
 end
