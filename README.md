@@ -279,6 +279,9 @@ end
 This job use 2 concurrency. (this does not means that job use 2 threads)
 If concurrency is less than jobs's resource count, resource count is set concurrency size.
 
+You can set 0 to resource count.
+If a job is set 0 resource, concurrency of the job is unlimited.
+
 ### Callback
 
 - before\_run
