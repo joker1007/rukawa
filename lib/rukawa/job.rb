@@ -72,8 +72,6 @@ module Rukawa
       end
     end
 
-    around_run :acquire_resource
-
     around_run do |_, blk|
       Rukawa.logger.info("Start #{self.class}")
       blk.call
@@ -114,8 +112,10 @@ module Rukawa
       return @dataflow = bypass_dataflow if @state.bypassed?
 
       @dataflow = Concurrent.dataflow_with(@context.executor, *depend_dataflows) do |*results|
-        do_run(*results)
-        @state
+        acquire_resource do
+          do_run(*results)
+          @state
+        end
       end
     end
 
