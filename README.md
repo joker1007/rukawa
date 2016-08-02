@@ -44,7 +44,7 @@ See [sample/job_nets/sample_job_net.rb](https://github.com/joker1007/rukawa/blob
 ```
 % cd rukawa/sample
 
-# load ./jobs/**/*.rb, ./job_net/**/*.rb automatically
+# load ./jobs/**/*.rb, ./job_nets/**/*.rb automatically
 % bundle exec rukawa run SampleJobNet -r 10 -c 10
 +----------------+----------+
 | Job            | Status   |
@@ -417,4 +417,3 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/joker1007/rukawa.
-
