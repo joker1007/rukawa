@@ -62,8 +62,12 @@ end
 class SampleJobNet < Rukawa::JobNet
   class << self
     def dependencies
+      wrapped1 = Rukawa::Wrapper::ActiveJob[ActiveJobSample1]
+      wrapped2 = Rukawa::Wrapper::ActiveJob[ActiveJobSample2]
       {
         Job1 => [],
+        wrapped1 => [Job1],
+        wrapped2 => [wrapped1],
         Job2 => [Job1], Job3 => [Job1],
         Job4 => [Job2, Job3],
         InnerJobNet => [Job3],
