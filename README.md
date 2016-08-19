@@ -331,6 +331,37 @@ end
 
 see. [Rukawa::Configuration](https://github.com/joker1007/rukawa/blob/master/lib/rukawa/configuration.rb)
 
+### ActiveJob Integration
+
+```ruby
+class SampleJobNet < Rukawa::JobNet
+  class << self
+    def dependencies
+      # Generate Wrapper class
+      wrapped1 = Rukawa::Wrapper::ActiveJob[ActiveJobSample1] # named Rukawa::Wrapper::ActiveJobSample1Wrapper
+      wrapped2 = Rukawa::Wrapper::ActiveJob[ActiveJobSample2] # named Rukawa::Wrapper::ActiveJobSample2Wrapper
+      {
+        Job1 => [],
+        wrapped1 => [Job1],
+        wrapped2 => [wrapped1],
+      }
+    end
+  end
+end
+```
+
+And write config to define status store for tracking remote job status"
+
+```ruby
+redis_host = ENV["REDIS_HOST"] || "localhost:6379"
+Rukawa.configure do |c|
+  c.status_store = ActiveSupport::Cache::RedisStore.new(redis_host)
+  c.status_expire_duration = 72 * 60 * 60 # default is 24 hours
+end
+```
+
+__Caution: When rukawa runs wrapper job, base ActiveJob class includes hook modules automatically in order to track job running status.__
+
 ### help
 ```
 % bundle exec rukawa help run
