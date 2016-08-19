@@ -68,7 +68,7 @@ class SampleJobNet < Rukawa::JobNet
         Job1 => [],
         wrapped1 => [Job1],
         wrapped2 => [wrapped1],
-        Job2 => [Job1], Job3 => [Job1],
+        Job2 => [Job1], Job3 => [Job1, wrapped1],
         Job4 => [Job2, Job3],
         InnerJobNet => [Job3],
         Job8 => [InnerJobNet],
