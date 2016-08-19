@@ -16,4 +16,9 @@ Rukawa.configure do |c|
   c.status_store = ActiveSupport::Cache::RedisStore.new(redis_host)
 end
 
+Rukawa.config.status_store.write("rukawa.test", "test", expires_in: 60)
+unless Rukawa.config.status_store.fetch("rukawa.test") == "test"
+  raise "status_store is bad"
+end
+
 ActiveJob::Base.queue_adapter = :sucker_punch
