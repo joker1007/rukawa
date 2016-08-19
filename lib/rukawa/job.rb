@@ -70,6 +70,17 @@ module Rukawa
       def around_run(*args, **options, &block)
         set_callback :run, :around, *args, **options, &block
       end
+
+      def wrappers
+        @@wrappers ||= {}
+      end
+
+      def wrapper_for(*classes)
+        classes.each do |c|
+          raise "Wrapper for #{c} is already defined" if wrappers[c]
+          wrappers[c] = self
+        end
+      end
     end
 
     around_run do |_, blk|

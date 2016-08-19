@@ -12,7 +12,9 @@ module Rukawa
       @config = OpenStruct.new(
         concurrency: Concurrent.processor_count,
         dot_command: "dot",
-        job_dirs: [File.join(Dir.pwd, "job_nets"), File.join(Dir.pwd, "jobs")]
+        job_dirs: [File.join(Dir.pwd, "job_nets"), File.join(Dir.pwd, "jobs")],
+        status_store: nil,
+        status_expire_duration: 24 * 60 * 60
       )
       @config.graph = GraphConfig.new.tap { |c| c.rankdir = "LR" }
     end
