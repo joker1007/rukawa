@@ -11,6 +11,8 @@ module Rukawa
         return @wrapper_classes[job_class] if @wrapper_classes[job_class]
 
         wrapper = Class.new(Rukawa::Job) do
+          set_resource_count 0
+
           define_singleton_method(:origin_class) do
             job_class
           end
