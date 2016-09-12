@@ -1,31 +1,33 @@
 digraph "SampleJobNet" {
 label = "SampleJobNet";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
-Job1 [style = filled,fillcolor = green];
-Job2 [style = filled,fillcolor = red];
-Job3 [style = filled,fillcolor = green];
-Job4 [style = filled,fillcolor = green];
+"Job1" [style = filled,fillcolor = green];
+"Rukawa::Wrapper::ActiveJobSample1Wrapper" [style = filled,fillcolor = green];
+"Rukawa::Wrapper::ActiveJobSample2Wrapper" [style = filled,fillcolor = red];
+"Job2" [style = filled,fillcolor = red];
+"Job3" [style = filled,fillcolor = green];
+"Job4" [style = filled,fillcolor = green];
 subgraph "cluster_InnerJobNet" {
 label = "InnerJobNet";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
-InnerJob3 [style = filled,fillcolor = green];
-InnerJob1 [style = filled,fillcolor = green];
-InnerJob2 [style = filled,fillcolor = red];
+"InnerJob3" [style = filled,fillcolor = green];
+"InnerJob1" [style = filled,fillcolor = green];
+"InnerJob2" [style = filled,fillcolor = red];
 "InnerJob1" -> "InnerJob2";
 "InnerJob3" -> "InnerJob2";
 }
-Job8 [style = filled,fillcolor = magenta];
-Job5 [style = filled,fillcolor = red];
-Job6 [style = filled,fillcolor = green];
-Job7 [style = filled,fillcolor = green];
+"Job8" [style = filled,fillcolor = magenta];
+"Job5" [style = filled,fillcolor = red];
+"Job6" [style = filled,fillcolor = green];
+"Job7" [style = filled,fillcolor = green];
 subgraph "cluster_InnerJobNet2" {
 label = "InnerJobNet2";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
-InnerJob4 [style = filled,fillcolor = green];
-InnerJob5 [style = filled,fillcolor = yellow];
-InnerJob6 [style = filled,fillcolor = magenta];
+"InnerJob4" [style = filled,fillcolor = green];
+"InnerJob5" [style = filled,fillcolor = yellow];
+"InnerJob6" [style = filled,fillcolor = magenta];
 "InnerJob4" -> "InnerJob5";
 "InnerJob4" -> "InnerJob6";
 "InnerJob5" -> "InnerJob6";
@@ -34,10 +36,10 @@ subgraph "cluster_InnerJobNet3" {
 label = "InnerJobNet3";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
-InnerJob7 [style = filled,fillcolor = magenta];
-InnerJob8 [style = filled,fillcolor = magenta];
-InnerJob9 [style = filled,fillcolor = magenta];
-InnerJob10 [style = filled,fillcolor = magenta];
+"InnerJob7" [style = filled,fillcolor = magenta];
+"InnerJob8" [style = filled,fillcolor = magenta];
+"InnerJob9" [style = filled,fillcolor = magenta];
+"InnerJob10" [style = filled,fillcolor = magenta];
 "InnerJob7" -> "InnerJob9";
 "InnerJob8" -> "InnerJob9";
 "InnerJob7" -> "InnerJob10";
@@ -47,22 +49,25 @@ subgraph "cluster_InnerJobNet4" {
 label = "InnerJobNet4";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
-InnerJob11 [style = filled,fillcolor = magenta];
-InnerJob12 [style = filled,fillcolor = magenta];
-InnerJob13 [style = filled,fillcolor = magenta];
+"InnerJob11" [style = filled,fillcolor = magenta];
+"InnerJob12" [style = filled,fillcolor = magenta];
+"InnerJob13" [style = filled,fillcolor = magenta];
 subgraph "cluster_NestedJobNet" {
 label = "NestedJobNet";
 graph [rankdir = LR,nodesep = 0.8,concentrate = true];
 color = blue;
-NestedJob1 [style = filled,fillcolor = magenta];
-NestedJob2 [style = filled,fillcolor = magenta];
+"NestedJob1" [style = filled,fillcolor = magenta];
+"NestedJob2" [style = filled,fillcolor = magenta];
 "NestedJob1" -> "NestedJob2";
 }
 "InnerJob11" -> "NestedJob1";
 "InnerJob12" -> "NestedJob1";
 }
+"Job1" -> "Rukawa::Wrapper::ActiveJobSample1Wrapper";
+"Rukawa::Wrapper::ActiveJobSample1Wrapper" -> "Rukawa::Wrapper::ActiveJobSample2Wrapper";
 "Job1" -> "Job2";
 "Job1" -> "Job3";
+"Rukawa::Wrapper::ActiveJobSample1Wrapper" -> "Job3";
 "Job2" -> "Job4";
 "Job3" -> "Job4";
 "Job3" -> "InnerJob3";

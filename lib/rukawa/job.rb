@@ -161,9 +161,9 @@ module Rukawa
 
     def to_dot_def
       if state == Rukawa::State::Waiting
-        "#{name};\n"
+        "\"#{name}\";\n"
       else
-        "#{name} [style = filled,fillcolor = #{state.color}];\n"
+        "\"#{name}\" [style = filled,fillcolor = #{state.color}];\n"
       end
     end
 
