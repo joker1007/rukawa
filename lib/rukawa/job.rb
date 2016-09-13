@@ -232,7 +232,10 @@ module Rukawa
     def fetch(job, key)
       job = job.is_a?(String) ? Object.const_get(job) : job
       raise TypeError, "job must be a Class" unless job.is_a?(Class)
-      @context.store[job][key]
+
+      if @context.store[job]
+        @context.store[job][key]
+      end
     end
 
     def acquire_resource
