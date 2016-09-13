@@ -229,6 +229,12 @@ module Rukawa
       @context.store[self.class][key] = value
     end
 
+    def fetch(job, key)
+      job = job.is_a?(String) ? Object.const_get(job) : job
+      raise TypeError, "job must be a Class" unless job.is_a?(Class)
+      @context.store[job][key]
+    end
+
     def acquire_resource
       @context.semaphore.acquire(resource_count) if resource_count > 0
       yield
