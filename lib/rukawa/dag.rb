@@ -18,7 +18,7 @@ module Rukawa
       deps = tsortable_hash(dependencies).tsort
 
       deps.each do |job_class|
-        job = job_class.new(job_net, variables, context)
+        job = job_class.new(variables: variables, context: context, parent_job_net: job_net)
         @nodes << job
         @jobs << job if job.is_a?(Job)
 

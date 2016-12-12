@@ -17,7 +17,7 @@ module Rukawa
             job_class
           end
 
-          def initialize(parent_job_net, variables, context)
+          def initialize(variables: {}, context: Context.new, parent_job_net: parent_job_net)
             super
             @job_class = self.class.origin_class
           end

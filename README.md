@@ -423,7 +423,7 @@ Output jobnet graph. If JOB_NET is set, simulate resumed job sequence
 
 ```ruby
 currency = 4
-job_net = YourJobNetClass.new(nil, {"var1" => "value1"}, Context.new(currency))
+job_net = YourJobNetClass.new(variables: {"var1" => "value1"})
 promise = job_net.run do
   puts "Job Running"
 end

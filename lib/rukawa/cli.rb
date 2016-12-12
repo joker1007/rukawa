@@ -35,7 +35,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, variables, Context.new, *job_classes)
+      job_net = job_net_class.new(resume_job_classes: job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
@@ -60,7 +60,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(nil, {}, Context.new, *job_classes)
+      job_net = job_net_class.new(resume_job_classes: job_classes)
       job_net.output_dot(options[:output], format: options[:format])
     end
 
@@ -75,7 +75,7 @@ module Rukawa
 
       job_classes = job_name.map { |name| get_class(name) }
       job_net_class = anonymous_job_net_class(*job_classes)
-      job_net = job_net_class.new(nil, variables, Context.new)
+      job_net = job_net_class.new
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]

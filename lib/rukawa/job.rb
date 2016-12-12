@@ -95,7 +95,7 @@ module Rukawa
       set_state(:finished)
     end
 
-    def initialize(parent_job_net, variables, context)
+    def initialize(variables: {}, context: Context.new, parent_job_net: nil)
       @parent_job_net = parent_job_net
       @variables = variables
       @context = context

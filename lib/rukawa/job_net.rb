@@ -11,7 +11,7 @@ module Rukawa
       end
     end
 
-    def initialize(parent_job_net, variables, context, *resume_job_classes)
+    def initialize(variables: {}, context: Context.new, parent_job_net: nil, resume_job_classes: [])
       @parent_job_net = parent_job_net
       @variables = variables
       @context = context
