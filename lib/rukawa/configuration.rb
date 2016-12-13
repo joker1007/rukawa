@@ -6,7 +6,6 @@ require 'concurrent'
 module Rukawa
   class Configuration < Delegator
     include Singleton
-    attr_accessor :logger
 
     def initialize
       @config = OpenStruct.new(
@@ -14,7 +13,8 @@ module Rukawa
         dot_command: "dot",
         job_dirs: [File.join(Dir.pwd, "job_nets"), File.join(Dir.pwd, "jobs")],
         status_store: nil,
-        status_expire_duration: 24 * 60 * 60
+        status_expire_duration: 24 * 60 * 60,
+        logger: Logger.new('./rukawa.log')
       )
       @config.graph = GraphConfig.new.tap { |c| c.rankdir = "LR" }
     end

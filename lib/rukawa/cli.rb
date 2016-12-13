@@ -131,8 +131,6 @@ module Rukawa
           c.logger = Syslog::Logger.new('rukawa')
         elsif options[:log]
           c.logger = Logger.new(options[:log])
-        else
-          c.logger ||= Logger.new('./rukawa.log');
         end
       end
     end
