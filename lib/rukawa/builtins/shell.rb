@@ -12,7 +12,7 @@ module Rukawa
       self.stderr = $stderr
 
       class << self
-        def def_parameters(command:, args: [], env: nil, chdir: nil, stdout: nil, stderr: nil)
+        def def_parameters(command:, args: [], env: nil, chdir: nil, stdout: nil, stderr: nil, **rest)
           self.command = command
           self.args = args
           self.env = env if env

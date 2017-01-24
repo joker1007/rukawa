@@ -32,4 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "redis-activesupport"
   spec.add_development_dependency "activejob"
   spec.add_development_dependency "sucker_punch"
+  spec.add_development_dependency "aws-sdk", "~> 2.0"
+  spec.add_development_dependency "google-api-client", "~> 0.9"
 end
