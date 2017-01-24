@@ -11,7 +11,7 @@ module Rukawa
       self.jvm_options = []
 
       class << self
-        def def_parameters(config:, embulk_bin: nil, embulk_bundle: nil, embulk_vm_options: nil, jvm_options: nil, stdout: nil, stderr: nil, env: nil, chdir: nil)
+        def handle_parameters(config:, embulk_bin: nil, embulk_bundle: nil, embulk_vm_options: nil, jvm_options: nil, stdout: nil, stderr: nil, env: nil, chdir: nil)
           self.config = config
           self.embulk_bin = embulk_bin if embulk_bin
           self.embulk_bundle = embulk_bundle if embulk_bundle

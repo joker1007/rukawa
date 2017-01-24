@@ -10,7 +10,7 @@ module Rukawa
       self.poll_interval = 1
 
       class << self
-        def def_parameters(timeout: nil, poll_interval: nil, **rest)
+        def handle_parameters(timeout: nil, poll_interval: nil, **rest)
           self.timeout = timeout if timeout
           self.poll_interval = poll_interval if poll_interval
         end
@@ -41,7 +41,7 @@ module Rukawa
       class_attribute :path
 
       class << self
-        def def_parameters(path:, **rest)
+        def handle_parameters(path:, **rest)
           self.path = path
           super(**rest)
         end
@@ -62,7 +62,7 @@ module Rukawa
       class_attribute :url, :aws_access_key_id, :aws_secret_access_key, :region
       
       class << self
-        def def_parameters(url:, aws_access_key_id: nil, aws_secret_access_key: nil, region: nil, **rest)
+        def handle_parameters(url:, aws_access_key_id: nil, aws_secret_access_key: nil, region: nil, **rest)
           require 'aws-sdk'
 
           self.url = url
@@ -105,7 +105,7 @@ module Rukawa
       class_attribute :url, :json_key
       
       class << self
-        def def_parameters(url:, json_key: nil, **rest)
+        def handle_parameters(url:, json_key: nil, **rest)
           require 'google/apis/storage_v1'
           require 'googleauth'
 

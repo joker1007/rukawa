@@ -6,7 +6,7 @@ module Rukawa
       class << self
         def [](**params)
           Class.new(self) do
-            def_parameters(params)
+            handle_parameters(params)
 
             def self.name
               super || "#{superclass.name}_#{object_id}"
@@ -14,7 +14,7 @@ module Rukawa
           end
         end
 
-        def def_parameters(**params)
+        def handle_parameters(**params)
         end
       end
     end
