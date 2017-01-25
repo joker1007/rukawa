@@ -26,7 +26,7 @@ module Rukawa
     end
 
     def name
-      self.class.to_s
+      self.class.name || self.class.to_s
     end
 
     def inspect
