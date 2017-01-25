@@ -37,6 +37,22 @@ module Rukawa
       end
     end
 
+    class SleepWaiter < Waiter
+      class_attribute :sec
+
+      class << self
+        def handle_parameters(sec:, **rest)
+          self.sec = sec
+        end
+      end
+
+      private
+
+      def fetch_condition
+        sleep sec
+      end
+    end
+
     class LocalFileWaiter < Waiter
       class_attribute :path, :if_modified_since, :if_unmodified_since
 
