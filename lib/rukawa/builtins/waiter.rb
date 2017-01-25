@@ -118,7 +118,6 @@ module Rukawa
       private
 
       def fetch_condition
-
         if url.respond_to?(:all?)
           url.all? do |u|
             gcsurl = URI.parse(u)
