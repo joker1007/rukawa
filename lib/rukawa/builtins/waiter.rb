@@ -38,11 +38,13 @@ module Rukawa
     end
 
     class LocalFileWaiter < Waiter
-      class_attribute :path
+      class_attribute :path, :if_modified_since, :if_unmodified_since
 
       class << self
-        def handle_parameters(path:, **rest)
+        def handle_parameters(path:, if_modified_since: nil, if_unmodified_since: nil, **rest)
           self.path = path
+          self.if_modified_since = if_modified_since if if_modified_since
+          self.if_unmodified_since = if_unmodified_since if if_unmodified_since
           super(**rest)
         end
       end
@@ -51,24 +53,41 @@ module Rukawa
 
       def fetch_condition
         if path.respond_to?(:all?)
-          path.all? { |p| File.exist?(p) }
+          get_stat_and_check_condition(p)
+          path.all?(&method(:get_stat_and_check_condition))
         else
-          File.exist?(path)
+          get_stat_and_check_condition(path)
         end
+      end
+
+      def get_stat_and_check_condition(path)
+        stat = File.stat(path)
+
+        if if_modified_since
+          stat.mtime > if_modified_since
+        elsif if_unmodified_since
+          stat.mtime <= if_unmodified_since
+        else
+          true
+        end
+      rescue
+        false
       end
     end
 
     class S3Waiter < Waiter
-      class_attribute :url, :aws_access_key_id, :aws_secret_access_key, :region
-      
+      class_attribute :url, :aws_access_key_id, :aws_secret_access_key, :region, :if_modified_since, :if_unmodified_since
+
       class << self
-        def handle_parameters(url:, aws_access_key_id: nil, aws_secret_access_key: nil, region: nil, **rest)
+        def handle_parameters(url:, aws_access_key_id: nil, aws_secret_access_key: nil, region: nil, if_modified_since: nil, if_unmodified_since: nil, **rest)
           require 'aws-sdk'
 
           self.url = url
           self.aws_access_key_id = aws_access_key_id if aws_access_key_id
           self.aws_secret_access_key = aws_secret_access_key if aws_secret_access_key
           self.region = region if region
+          self.if_modified_since = if_modified_since if if_modified_since
+          self.if_unmodified_since = if_unmodified_since if if_unmodified_since
           super(**rest)
         end
       end
@@ -76,14 +95,18 @@ module Rukawa
       private
 
       def fetch_condition
+        opts = {if_modified_since: if_modified_since, if_unmodified_since: if_unmodified_since}.reject do |_, v|
+          v.nil?
+        end
+
         if url.respond_to?(:all?)
           url.all? do |u|
             s3url = URI.parse(u)
-            client.head_object(bucket: s3url.host, key: s3url.path[1..-1]) rescue false
+            client.head_object(bucket: s3url.host, key: s3url.path[1..-1], **opts) rescue false
           end
         else
           s3url = URI.parse(url)
-          client.head_object(bucket: s3url.host, key: s3url.path[1..-1]) rescue false
+          client.head_object(bucket: s3url.host, key: s3url.path[1..-1], **opts) rescue false
         end
       end
 
@@ -102,15 +125,17 @@ module Rukawa
     end
 
     class GCSWaiter < Waiter
-      class_attribute :url, :json_key
-      
+      class_attribute :url, :json_key, :if_modified_since, :if_unmodified_since
+
       class << self
-        def handle_parameters(url:, json_key: nil, **rest)
+        def handle_parameters(url:, json_key: nil, if_modified_since: nil, if_unmodified_since: nil, **rest)
           require 'google/apis/storage_v1'
           require 'googleauth'
 
           self.url = url
           self.json_key = json_key if json_key
+          self.if_modified_since = if_modified_since if if_modified_since
+          self.if_unmodified_since = if_unmodified_since if if_unmodified_since
           super(**rest)
         end
       end
@@ -120,13 +145,24 @@ module Rukawa
       def fetch_condition
         if url.respond_to?(:all?)
           url.all? do |u|
-            gcsurl = URI.parse(u)
-            client.list_objects(gcsurl.host, prefix: gcsurl.path[1..-1]).items.size > 0 rescue false
+            get_object_and_check_condition(URI.parse(u))
           end
         else
-          gcsurl = URI.parse(url)
-          client.list_objects(gcsurl.host, prefix: gcsurl.path[1..-1]).items.size > 0 rescue false
+          get_object_and_check_condition(URI.parse(url))
         end
+      end
+
+      def get_object_and_check_condition(url)
+        obj = client.get_object(url.host, url.path[1..-1])
+        if if_modified_since
+          obj.updated.to_time > if_modified_since
+        elsif if_unmodified_since
+          obj.updated.to_time <= if_unmodified_since
+        else
+          true
+        end
+      rescue
+        false
       end
 
       def client
