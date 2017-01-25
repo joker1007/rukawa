@@ -43,25 +43,36 @@ describe Rukawa do
           set << n
         end
       end
+      j.dependencies.each_value do |parents|
+        parents.each do |n|
+          if n.respond_to?(:dependencies)
+            collect_jobs.call(n, set)
+          else
+            set << n
+          end
+        end
+      end
     }
     collect_jobs.call(SampleJobNet, job_classes)
 
-    assert { job_net.dag.jobs.size == job_classes.size}
+    aggregate_failures do
+      assert { job_net.dag.jobs.size == job_classes.size}
 
-    job4 = find_job(job_net, Job4)
-    expect(job4.in_comings.map(&:from)).to match_array([an_instance_of(Job2), an_instance_of(Job3)])
+      job4 = find_job(job_net, Job4)
+      expect(job4.in_comings.map(&:from)).to match_array([an_instance_of(Job2), an_instance_of(Job3)])
 
-    job8 = find_job(job_net, Job8)
-    expect(job8.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob2)])
-    expect(job8.out_goings.map(&:to)).to match_array([an_instance_of(InnerJob7), an_instance_of(InnerJob8)])
+      job8 = find_job(job_net, Job8)
+      expect(job8.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob2)])
+      expect(job8.out_goings.map(&:to)).to match_array([an_instance_of(InnerJob7), an_instance_of(InnerJob8)])
 
-    inner_job11 = find_job(job_net, InnerJob11)
-    expect(inner_job11.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob9), an_instance_of(InnerJob10)])
-    expect(inner_job11.out_goings.map(&:to)).to match_array([an_instance_of(NestedJob1)])
+      inner_job11 = find_job(job_net, InnerJob11)
+      expect(inner_job11.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob9), an_instance_of(InnerJob10)])
+      expect(inner_job11.out_goings.map(&:to)).to match_array([an_instance_of(NestedJob1)])
 
-    inner_job12 = find_job(job_net, InnerJob12)
-    expect(inner_job12.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob9), an_instance_of(InnerJob10)])
-    expect(inner_job12.out_goings.map(&:to)).to match_array([an_instance_of(NestedJob1)])
+      inner_job12 = find_job(job_net, InnerJob12)
+      expect(inner_job12.in_comings.map(&:from)).to match_array([an_instance_of(InnerJob9), an_instance_of(InnerJob10)])
+      expect(inner_job12.out_goings.map(&:to)).to match_array([an_instance_of(NestedJob1)])
+    end
   end
 
   it 'skip hierarchy' do

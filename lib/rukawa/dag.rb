@@ -92,6 +92,7 @@ module Rukawa
     private
 
     def tsortable_hash(hash)
+      ensure_dependencies_have_all_jobs_as_key!(hash)
       class << hash
         include TSort
         alias :tsort_each_node :each_key
@@ -100,6 +101,14 @@ module Rukawa
         end
       end
       hash
+    end
+
+    def ensure_dependencies_have_all_jobs_as_key!(hash)
+      hash.values.each do |parents|
+        parents.each do |j|
+          hash[j] ||= []
+        end
+      end
     end
 
     class Edge
