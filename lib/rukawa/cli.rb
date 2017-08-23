@@ -35,7 +35,7 @@ module Rukawa
 
       job_net_class = get_class(job_net_name)
       job_classes = job_name.map { |name| get_class(name) }
-      job_net = job_net_class.new(resume_job_classes: job_classes)
+      job_net = job_net_class.new(variables: variables, resume_job_classes: job_classes)
       result = Runner.run(job_net, options[:batch], options[:refresh_interval])
 
       if options[:dot]
