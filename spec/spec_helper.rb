@@ -13,7 +13,11 @@ Dir.glob(File.expand_path('../../sample/jobs/**/*.rb', __FILE__)).each { |f| req
 
 redis_host = ENV["REDIS_HOST"] || "localhost:6379"
 Rukawa.configure do |c|
-  c.status_store = ActiveSupport::Cache::RedisStore.new(redis_host)
+  c.status_store = if ActiveSupport.version >= Gem::Version.new("5.2")
+                     ActiveSupport::Cache::RedisCacheStore.new(url: "redis://#{redis_host}")
+                   else
+                     ActiveSupport::Cache::RedisStore.new(redis_host)
+                   end
 end
 
 Rukawa.config.status_store.write("rukawa.test", "test", expires_in: 60)
