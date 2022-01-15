@@ -1,6 +1,6 @@
 # Rukawa
 [![Gem Version](https://badge.fury.io/rb/rukawa.svg)](https://badge.fury.io/rb/rukawa)
-[![Build Status](https://travis-ci.org/joker1007/rukawa.svg?branch=master)](https://travis-ci.org/joker1007/rukawa)
+[![test](https://github.com/joker1007/rukawa/actions/workflows/test.yml/badge.svg)](https://github.com/joker1007/rukawa/actions/workflows/test.yml)
 [![Code Climate](https://codeclimate.com/github/joker1007/rukawa/badges/gpa.svg)](https://codeclimate.com/github/joker1007/rukawa)
 
 Rukawa = (流川)
