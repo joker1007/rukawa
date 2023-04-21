@@ -18,7 +18,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "activesupport", ">= 4", "< 7"
+  spec.add_runtime_dependency "activesupport", ">= 6"
+  spec.add_runtime_dependency "redis"
   spec.add_runtime_dependency "concurrent-ruby"
   spec.add_runtime_dependency "thor"
   spec.add_runtime_dependency "terminal-table"
@@ -29,7 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-power_assert"
   spec.add_development_dependency "rspec-parameterized"
-  spec.add_development_dependency "redis-activesupport"
   spec.add_development_dependency "activejob"
   spec.add_development_dependency "sucker_punch"
   spec.add_development_dependency "aws-sdk", "~> 2.0"

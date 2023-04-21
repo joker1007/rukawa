@@ -1,9 +1,0 @@
-language: ruby
-sudo: required
-cache: bundler
-rvm:
-  - 2.6.2
-  - 2.5.2
-services:
-  - redis-server
-before_install: gem install bundler -v 2.0.1

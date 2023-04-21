@@ -3,8 +3,6 @@ Rukawa.configure do |c|
   c.graph.nodesep = 0.8
 end
 
-require 'redis-activesupport'
-
 redis_host = ENV["REDIS_HOST"] || "localhost:6379"
 Rukawa.configure do |c|
   c.status_store = ActiveSupport::Cache::RedisStore.new(redis_host)
