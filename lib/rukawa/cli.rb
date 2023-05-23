@@ -114,7 +114,7 @@ module Rukawa
       if options[:config]
         load File.expand_path(options[:config], Dir.pwd)
       else
-        load default_config_file if File.exists?(default_config_file)
+        load default_config_file if File.exist?(default_config_file)
       end
 
       Rukawa.configure do |c|
