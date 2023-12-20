@@ -6,7 +6,6 @@ module Rukawa
       @concurrency = concurrency || Rukawa.config.concurrency
       @store = Concurrent::Hash.new
       @executor = Concurrent::CachedThreadPool.new
-      @executor.auto_terminate = true
       @semaphore = Concurrent::Semaphore.new(@concurrency)
     end
 
